@@ -420,7 +420,8 @@ extension ECS {
         public let id: String?
         ///  The status of the attachment. Valid values are PRECREATED,
         /// 				CREATED, ATTACHING, ATTACHED,
-        /// 				DETACHING, DETACHED, and DELETED.
+        /// 				DETACHING, DETACHED, DELETED, and
+        /// 				FAILED.
         public let status: String?
         /// The type of the attachment, such as ElasticNetworkInterface.
         public let type: String?
@@ -496,7 +497,7 @@ extension ECS {
         public let managedScaling: ManagedScaling?
         /// The managed termination protection setting to use for the Auto Scaling group capacity
         /// 			provider. This determines whether the Auto Scaling group has managed termination
-        /// 			protection.
+        /// 			protection. The default is disabled.
         ///
         /// 			         When using managed termination protection, managed scaling must also be used
         /// 				otherwise managed termination protection doesn't work.
@@ -7216,7 +7217,7 @@ extension ECS {
         /// The short name or full Amazon Resource Name (ARN) of the cluster that hosts the container instance to
         /// 			update. If you do not specify a cluster, the default cluster is assumed.
         public let cluster: String?
-        /// A list of container instance IDs or full ARN entries.
+        /// A list of up to 10 container instance IDs or full ARN entries.
         public let containerInstances: [String]
         /// The container instance state to update the container instance with. The only valid
         /// 			values for this action are ACTIVE and DRAINING. A container

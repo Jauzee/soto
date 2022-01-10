@@ -265,6 +265,12 @@ extension Glue {
         public var description: String { return self.rawValue }
     }
 
+    public enum PermissionType: String, CustomStringConvertible, Codable {
+        case cellFilterPermission = "CELL_FILTER_PERMISSION"
+        case columnPermission = "COLUMN_PERMISSION"
+        public var description: String { return self.rawValue }
+    }
+
     public enum PrincipalType: String, CustomStringConvertible, Codable {
         case group = "GROUP"
         case role = "ROLE"
@@ -480,6 +486,22 @@ extension Glue {
             case notificationProperty = "NotificationProperty"
             case securityConfiguration = "SecurityConfiguration"
             case timeout = "Timeout"
+        }
+    }
+
+    public struct AuditContext: AWSEncodableShape {
+        public let additionalAuditContext: String?
+
+        public init(additionalAuditContext: String? = nil) {
+            self.additionalAuditContext = additionalAuditContext
+        }
+
+        public func validate(name: String) throws {
+            try self.validate(self.additionalAuditContext, name: "additionalAuditContext", parent: name, max: 2048)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case additionalAuditContext = "AdditionalAuditContext"
         }
     }
 
@@ -1516,12 +1538,15 @@ extension Glue {
     }
 
     public struct CatalogTarget: AWSEncodableShape & AWSDecodableShape {
+        /// The name of the connection for an Amazon S3-backed Data Catalog table to be a target of the crawl when using a Catalog connection type paired with a NETWORK Connection type.
+        public let connectionName: String?
         /// The name of the database to be synchronized.
         public let databaseName: String
         /// A list of the tables to be synchronized.
         public let tables: [String]
 
-        public init(databaseName: String, tables: [String]) {
+        public init(connectionName: String? = nil, databaseName: String, tables: [String]) {
+            self.connectionName = connectionName
             self.databaseName = databaseName
             self.tables = tables
         }
@@ -1539,6 +1564,7 @@ extension Glue {
         }
 
         private enum CodingKeys: String, CodingKey {
+            case connectionName = "ConnectionName"
             case databaseName = "DatabaseName"
             case tables = "Tables"
         }
@@ -1785,6 +1811,21 @@ extension Glue {
         private enum CodingKeys: String, CodingKey {
             case columnName = "ColumnName"
             case importance = "Importance"
+        }
+    }
+
+    public struct ColumnRowFilter: AWSDecodableShape {
+        public let columnName: String?
+        public let rowFilterExpression: String?
+
+        public init(columnName: String? = nil, rowFilterExpression: String? = nil) {
+            self.columnName = columnName
+            self.rowFilterExpression = rowFilterExpression
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case columnName = "ColumnName"
+            case rowFilterExpression = "RowFilterExpression"
         }
     }
 
@@ -2137,6 +2178,7 @@ extension Glue {
         public let databaseName: String?
         /// A description of the crawler.
         public let description: String?
+        public let lakeFormationConfiguration: LakeFormationConfiguration?
         /// The status of the last crawl, and potentially error information if an error occurred.
         public let lastCrawl: LastCrawlInfo?
         /// The time that the crawler was last updated.
@@ -2162,7 +2204,7 @@ extension Glue {
         /// The version of the crawler.
         public let version: Int64?
 
-        public init(classifiers: [String]? = nil, configuration: String? = nil, crawlElapsedTime: Int64? = nil, crawlerSecurityConfiguration: String? = nil, creationTime: Date? = nil, databaseName: String? = nil, description: String? = nil, lastCrawl: LastCrawlInfo? = nil, lastUpdated: Date? = nil, lineageConfiguration: LineageConfiguration? = nil, name: String? = nil, recrawlPolicy: RecrawlPolicy? = nil, role: String? = nil, schedule: Schedule? = nil, schemaChangePolicy: SchemaChangePolicy? = nil, state: CrawlerState? = nil, tablePrefix: String? = nil, targets: CrawlerTargets? = nil, version: Int64? = nil) {
+        public init(classifiers: [String]? = nil, configuration: String? = nil, crawlElapsedTime: Int64? = nil, crawlerSecurityConfiguration: String? = nil, creationTime: Date? = nil, databaseName: String? = nil, description: String? = nil, lakeFormationConfiguration: LakeFormationConfiguration? = nil, lastCrawl: LastCrawlInfo? = nil, lastUpdated: Date? = nil, lineageConfiguration: LineageConfiguration? = nil, name: String? = nil, recrawlPolicy: RecrawlPolicy? = nil, role: String? = nil, schedule: Schedule? = nil, schemaChangePolicy: SchemaChangePolicy? = nil, state: CrawlerState? = nil, tablePrefix: String? = nil, targets: CrawlerTargets? = nil, version: Int64? = nil) {
             self.classifiers = classifiers
             self.configuration = configuration
             self.crawlElapsedTime = crawlElapsedTime
@@ -2170,6 +2212,7 @@ extension Glue {
             self.creationTime = creationTime
             self.databaseName = databaseName
             self.description = description
+            self.lakeFormationConfiguration = lakeFormationConfiguration
             self.lastCrawl = lastCrawl
             self.lastUpdated = lastUpdated
             self.lineageConfiguration = lineageConfiguration
@@ -2192,6 +2235,7 @@ extension Glue {
             case creationTime = "CreationTime"
             case databaseName = "DatabaseName"
             case description = "Description"
+            case lakeFormationConfiguration = "LakeFormationConfiguration"
             case lastCrawl = "LastCrawl"
             case lastUpdated = "LastUpdated"
             case lineageConfiguration = "LineageConfiguration"
@@ -2264,6 +2308,8 @@ extension Glue {
     public struct CrawlerTargets: AWSEncodableShape & AWSDecodableShape {
         /// Specifies Glue Data Catalog targets.
         public let catalogTargets: [CatalogTarget]?
+        /// Specifies Delta data store targets.
+        public let deltaTargets: [DeltaTarget]?
         /// Specifies Amazon DynamoDB targets.
         public let dynamoDBTargets: [DynamoDBTarget]?
         /// Specifies JDBC targets.
@@ -2273,8 +2319,9 @@ extension Glue {
         /// Specifies Amazon Simple Storage Service (Amazon S3) targets.
         public let s3Targets: [S3Target]?
 
-        public init(catalogTargets: [CatalogTarget]? = nil, dynamoDBTargets: [DynamoDBTarget]? = nil, jdbcTargets: [JdbcTarget]? = nil, mongoDBTargets: [MongoDBTarget]? = nil, s3Targets: [S3Target]? = nil) {
+        public init(catalogTargets: [CatalogTarget]? = nil, deltaTargets: [DeltaTarget]? = nil, dynamoDBTargets: [DynamoDBTarget]? = nil, jdbcTargets: [JdbcTarget]? = nil, mongoDBTargets: [MongoDBTarget]? = nil, s3Targets: [S3Target]? = nil) {
             self.catalogTargets = catalogTargets
+            self.deltaTargets = deltaTargets
             self.dynamoDBTargets = dynamoDBTargets
             self.jdbcTargets = jdbcTargets
             self.mongoDBTargets = mongoDBTargets
@@ -2289,6 +2336,7 @@ extension Glue {
 
         private enum CodingKeys: String, CodingKey {
             case catalogTargets = "CatalogTargets"
+            case deltaTargets = "DeltaTargets"
             case dynamoDBTargets = "DynamoDBTargets"
             case jdbcTargets = "JdbcTargets"
             case mongoDBTargets = "MongoDBTargets"
@@ -2436,6 +2484,7 @@ extension Glue {
         public let databaseName: String?
         /// A description of the new crawler.
         public let description: String?
+        public let lakeFormationConfiguration: LakeFormationConfiguration?
         /// Specifies data lineage configuration settings for the crawler.
         public let lineageConfiguration: LineageConfiguration?
         /// Name of the new crawler.
@@ -2455,12 +2504,13 @@ extension Glue {
         /// A list of collection of targets to crawl.
         public let targets: CrawlerTargets
 
-        public init(classifiers: [String]? = nil, configuration: String? = nil, crawlerSecurityConfiguration: String? = nil, databaseName: String? = nil, description: String? = nil, lineageConfiguration: LineageConfiguration? = nil, name: String, recrawlPolicy: RecrawlPolicy? = nil, role: String, schedule: String? = nil, schemaChangePolicy: SchemaChangePolicy? = nil, tablePrefix: String? = nil, tags: [String: String]? = nil, targets: CrawlerTargets) {
+        public init(classifiers: [String]? = nil, configuration: String? = nil, crawlerSecurityConfiguration: String? = nil, databaseName: String? = nil, description: String? = nil, lakeFormationConfiguration: LakeFormationConfiguration? = nil, lineageConfiguration: LineageConfiguration? = nil, name: String, recrawlPolicy: RecrawlPolicy? = nil, role: String, schedule: String? = nil, schemaChangePolicy: SchemaChangePolicy? = nil, tablePrefix: String? = nil, tags: [String: String]? = nil, targets: CrawlerTargets) {
             self.classifiers = classifiers
             self.configuration = configuration
             self.crawlerSecurityConfiguration = crawlerSecurityConfiguration
             self.databaseName = databaseName
             self.description = description
+            self.lakeFormationConfiguration = lakeFormationConfiguration
             self.lineageConfiguration = lineageConfiguration
             self.name = name
             self.recrawlPolicy = recrawlPolicy
@@ -2481,6 +2531,7 @@ extension Glue {
             try self.validate(self.crawlerSecurityConfiguration, name: "crawlerSecurityConfiguration", parent: name, max: 128)
             try self.validate(self.description, name: "description", parent: name, max: 2048)
             try self.validate(self.description, name: "description", parent: name, pattern: "^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\r\\n\\t]*$")
+            try self.lakeFormationConfiguration?.validate(name: "\(name).lakeFormationConfiguration")
             try self.validate(self.name, name: "name", parent: name, max: 255)
             try self.validate(self.name, name: "name", parent: name, min: 1)
             try self.validate(self.name, name: "name", parent: name, pattern: "^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\t]*$")
@@ -2500,6 +2551,7 @@ extension Glue {
             case crawlerSecurityConfiguration = "CrawlerSecurityConfiguration"
             case databaseName = "DatabaseName"
             case description = "Description"
+            case lakeFormationConfiguration = "LakeFormationConfiguration"
             case lineageConfiguration = "LineageConfiguration"
             case name = "Name"
             case recrawlPolicy = "RecrawlPolicy"
@@ -4752,6 +4804,27 @@ extension Glue {
 
         private enum CodingKeys: String, CodingKey {
             case name = "Name"
+        }
+    }
+
+    public struct DeltaTarget: AWSEncodableShape & AWSDecodableShape {
+        /// The name of the connection to use to connect to the Delta table target.
+        public let connectionName: String?
+        /// A list of the Amazon S3 paths to the Delta tables.
+        public let deltaTables: [String]?
+        /// Specifies whether to write the manifest files to the Delta table path.
+        public let writeManifest: Bool?
+
+        public init(connectionName: String? = nil, deltaTables: [String]? = nil, writeManifest: Bool? = nil) {
+            self.connectionName = connectionName
+            self.deltaTables = deltaTables
+            self.writeManifest = writeManifest
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case connectionName = "ConnectionName"
+            case deltaTables = "DeltaTables"
+            case writeManifest = "WriteManifest"
         }
     }
 
@@ -7604,6 +7677,200 @@ extension Glue {
         }
     }
 
+    public struct GetUnfilteredPartitionMetadataRequest: AWSEncodableShape {
+        public let auditContext: AuditContext?
+        public let catalogId: String
+        public let databaseName: String
+        public let partitionValues: [String]
+        public let supportedPermissionTypes: [PermissionType]
+        public let tableName: String
+
+        public init(auditContext: AuditContext? = nil, catalogId: String, databaseName: String, partitionValues: [String], supportedPermissionTypes: [PermissionType], tableName: String) {
+            self.auditContext = auditContext
+            self.catalogId = catalogId
+            self.databaseName = databaseName
+            self.partitionValues = partitionValues
+            self.supportedPermissionTypes = supportedPermissionTypes
+            self.tableName = tableName
+        }
+
+        public func validate(name: String) throws {
+            try self.auditContext?.validate(name: "\(name).auditContext")
+            try self.validate(self.catalogId, name: "catalogId", parent: name, max: 255)
+            try self.validate(self.catalogId, name: "catalogId", parent: name, min: 1)
+            try self.validate(self.catalogId, name: "catalogId", parent: name, pattern: "^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\t]*$")
+            try self.validate(self.databaseName, name: "databaseName", parent: name, max: 255)
+            try self.validate(self.databaseName, name: "databaseName", parent: name, min: 1)
+            try self.validate(self.databaseName, name: "databaseName", parent: name, pattern: "^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\t]*$")
+            try self.partitionValues.forEach {
+                try validate($0, name: "partitionValues[]", parent: name, max: 1024)
+            }
+            try self.validate(self.supportedPermissionTypes, name: "supportedPermissionTypes", parent: name, max: 255)
+            try self.validate(self.supportedPermissionTypes, name: "supportedPermissionTypes", parent: name, min: 1)
+            try self.validate(self.tableName, name: "tableName", parent: name, max: 255)
+            try self.validate(self.tableName, name: "tableName", parent: name, min: 1)
+            try self.validate(self.tableName, name: "tableName", parent: name, pattern: "^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\t]*$")
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case auditContext = "AuditContext"
+            case catalogId = "CatalogId"
+            case databaseName = "DatabaseName"
+            case partitionValues = "PartitionValues"
+            case supportedPermissionTypes = "SupportedPermissionTypes"
+            case tableName = "TableName"
+        }
+    }
+
+    public struct GetUnfilteredPartitionMetadataResponse: AWSDecodableShape {
+        public let authorizedColumns: [String]?
+        public let isRegisteredWithLakeFormation: Bool?
+        public let partition: Partition?
+
+        public init(authorizedColumns: [String]? = nil, isRegisteredWithLakeFormation: Bool? = nil, partition: Partition? = nil) {
+            self.authorizedColumns = authorizedColumns
+            self.isRegisteredWithLakeFormation = isRegisteredWithLakeFormation
+            self.partition = partition
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case authorizedColumns = "AuthorizedColumns"
+            case isRegisteredWithLakeFormation = "IsRegisteredWithLakeFormation"
+            case partition = "Partition"
+        }
+    }
+
+    public struct GetUnfilteredPartitionsMetadataRequest: AWSEncodableShape {
+        public let auditContext: AuditContext?
+        public let catalogId: String
+        public let databaseName: String
+        public let expression: String?
+        public let maxResults: Int?
+        public let nextToken: String?
+        public let segment: Segment?
+        public let supportedPermissionTypes: [PermissionType]
+        public let tableName: String
+
+        public init(auditContext: AuditContext? = nil, catalogId: String, databaseName: String, expression: String? = nil, maxResults: Int? = nil, nextToken: String? = nil, segment: Segment? = nil, supportedPermissionTypes: [PermissionType], tableName: String) {
+            self.auditContext = auditContext
+            self.catalogId = catalogId
+            self.databaseName = databaseName
+            self.expression = expression
+            self.maxResults = maxResults
+            self.nextToken = nextToken
+            self.segment = segment
+            self.supportedPermissionTypes = supportedPermissionTypes
+            self.tableName = tableName
+        }
+
+        public func validate(name: String) throws {
+            try self.auditContext?.validate(name: "\(name).auditContext")
+            try self.validate(self.catalogId, name: "catalogId", parent: name, max: 255)
+            try self.validate(self.catalogId, name: "catalogId", parent: name, min: 1)
+            try self.validate(self.catalogId, name: "catalogId", parent: name, pattern: "^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\t]*$")
+            try self.validate(self.databaseName, name: "databaseName", parent: name, max: 255)
+            try self.validate(self.databaseName, name: "databaseName", parent: name, min: 1)
+            try self.validate(self.databaseName, name: "databaseName", parent: name, pattern: "^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\t]*$")
+            try self.validate(self.expression, name: "expression", parent: name, max: 2048)
+            try self.validate(self.expression, name: "expression", parent: name, pattern: "^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\r\\n\\t]*$")
+            try self.validate(self.maxResults, name: "maxResults", parent: name, max: 1000)
+            try self.validate(self.maxResults, name: "maxResults", parent: name, min: 1)
+            try self.segment?.validate(name: "\(name).segment")
+            try self.validate(self.supportedPermissionTypes, name: "supportedPermissionTypes", parent: name, max: 255)
+            try self.validate(self.supportedPermissionTypes, name: "supportedPermissionTypes", parent: name, min: 1)
+            try self.validate(self.tableName, name: "tableName", parent: name, max: 255)
+            try self.validate(self.tableName, name: "tableName", parent: name, min: 1)
+            try self.validate(self.tableName, name: "tableName", parent: name, pattern: "^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\t]*$")
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case auditContext = "AuditContext"
+            case catalogId = "CatalogId"
+            case databaseName = "DatabaseName"
+            case expression = "Expression"
+            case maxResults = "MaxResults"
+            case nextToken = "NextToken"
+            case segment = "Segment"
+            case supportedPermissionTypes = "SupportedPermissionTypes"
+            case tableName = "TableName"
+        }
+    }
+
+    public struct GetUnfilteredPartitionsMetadataResponse: AWSDecodableShape {
+        public let nextToken: String?
+        public let unfilteredPartitions: [UnfilteredPartition]?
+
+        public init(nextToken: String? = nil, unfilteredPartitions: [UnfilteredPartition]? = nil) {
+            self.nextToken = nextToken
+            self.unfilteredPartitions = unfilteredPartitions
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case nextToken = "NextToken"
+            case unfilteredPartitions = "UnfilteredPartitions"
+        }
+    }
+
+    public struct GetUnfilteredTableMetadataRequest: AWSEncodableShape {
+        public let auditContext: AuditContext?
+        public let catalogId: String
+        public let databaseName: String
+        public let name: String
+        public let supportedPermissionTypes: [PermissionType]
+
+        public init(auditContext: AuditContext? = nil, catalogId: String, databaseName: String, name: String, supportedPermissionTypes: [PermissionType]) {
+            self.auditContext = auditContext
+            self.catalogId = catalogId
+            self.databaseName = databaseName
+            self.name = name
+            self.supportedPermissionTypes = supportedPermissionTypes
+        }
+
+        public func validate(name: String) throws {
+            try self.auditContext?.validate(name: "\(name).auditContext")
+            try self.validate(self.catalogId, name: "catalogId", parent: name, max: 255)
+            try self.validate(self.catalogId, name: "catalogId", parent: name, min: 1)
+            try self.validate(self.catalogId, name: "catalogId", parent: name, pattern: "^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\t]*$")
+            try self.validate(self.databaseName, name: "databaseName", parent: name, max: 255)
+            try self.validate(self.databaseName, name: "databaseName", parent: name, min: 1)
+            try self.validate(self.databaseName, name: "databaseName", parent: name, pattern: "^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\t]*$")
+            try self.validate(self.name, name: "name", parent: name, max: 255)
+            try self.validate(self.name, name: "name", parent: name, min: 1)
+            try self.validate(self.name, name: "name", parent: name, pattern: "^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\t]*$")
+            try self.validate(self.supportedPermissionTypes, name: "supportedPermissionTypes", parent: name, max: 255)
+            try self.validate(self.supportedPermissionTypes, name: "supportedPermissionTypes", parent: name, min: 1)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case auditContext = "AuditContext"
+            case catalogId = "CatalogId"
+            case databaseName = "DatabaseName"
+            case name = "Name"
+            case supportedPermissionTypes = "SupportedPermissionTypes"
+        }
+    }
+
+    public struct GetUnfilteredTableMetadataResponse: AWSDecodableShape {
+        public let authorizedColumns: [String]?
+        public let cellFilters: [ColumnRowFilter]?
+        public let isRegisteredWithLakeFormation: Bool?
+        public let table: Table?
+
+        public init(authorizedColumns: [String]? = nil, cellFilters: [ColumnRowFilter]? = nil, isRegisteredWithLakeFormation: Bool? = nil, table: Table? = nil) {
+            self.authorizedColumns = authorizedColumns
+            self.cellFilters = cellFilters
+            self.isRegisteredWithLakeFormation = isRegisteredWithLakeFormation
+            self.table = table
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case authorizedColumns = "AuthorizedColumns"
+            case cellFilters = "CellFilters"
+            case isRegisteredWithLakeFormation = "IsRegisteredWithLakeFormation"
+            case table = "Table"
+        }
+    }
+
     public struct GetUserDefinedFunctionRequest: AWSEncodableShape {
         /// The ID of the Data Catalog where the function to be retrieved is located. If none is provided, the Amazon Web Services account ID is used by default.
         public let catalogId: String?
@@ -8564,6 +8831,25 @@ extension Glue {
 
         private enum CodingKeys: String, CodingKey {
             case outputS3Path = "OutputS3Path"
+        }
+    }
+
+    public struct LakeFormationConfiguration: AWSEncodableShape & AWSDecodableShape {
+        public let accountId: String?
+        public let useLakeFormationCredentials: Bool?
+
+        public init(accountId: String? = nil, useLakeFormationCredentials: Bool? = nil) {
+            self.accountId = accountId
+            self.useLakeFormationCredentials = useLakeFormationCredentials
+        }
+
+        public func validate(name: String) throws {
+            try self.validate(self.accountId, name: "accountId", parent: name, max: 12)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case accountId = "AccountId"
+            case useLakeFormationCredentials = "UseLakeFormationCredentials"
         }
     }
 
@@ -11367,6 +11653,7 @@ extension Glue {
     }
 
     public struct StorageDescriptor: AWSEncodableShape & AWSDecodableShape {
+        public let additionalLocations: [String]?
         /// A list of reducer grouping columns, clustering columns, and bucketing columns in the table.
         public let bucketColumns: [String]?
         /// A list of the Columns in the table.
@@ -11396,7 +11683,8 @@ extension Glue {
         ///  True if the table data is stored in subdirectories, or False if not.
         public let storedAsSubDirectories: Bool?
 
-        public init(bucketColumns: [String]? = nil, columns: [Column]? = nil, compressed: Bool? = nil, inputFormat: String? = nil, location: String? = nil, numberOfBuckets: Int? = nil, outputFormat: String? = nil, parameters: [String: String]? = nil, schemaReference: SchemaReference? = nil, serdeInfo: SerDeInfo? = nil, skewedInfo: SkewedInfo? = nil, sortColumns: [Order]? = nil, storedAsSubDirectories: Bool? = nil) {
+        public init(additionalLocations: [String]? = nil, bucketColumns: [String]? = nil, columns: [Column]? = nil, compressed: Bool? = nil, inputFormat: String? = nil, location: String? = nil, numberOfBuckets: Int? = nil, outputFormat: String? = nil, parameters: [String: String]? = nil, schemaReference: SchemaReference? = nil, serdeInfo: SerDeInfo? = nil, skewedInfo: SkewedInfo? = nil, sortColumns: [Order]? = nil, storedAsSubDirectories: Bool? = nil) {
+            self.additionalLocations = additionalLocations
             self.bucketColumns = bucketColumns
             self.columns = columns
             self.compressed = compressed
@@ -11413,6 +11701,10 @@ extension Glue {
         }
 
         public func validate(name: String) throws {
+            try self.additionalLocations?.forEach {
+                try validate($0, name: "additionalLocations[]", parent: name, max: 2056)
+                try validate($0, name: "additionalLocations[]", parent: name, pattern: "^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\r\\n\\t]*$")
+            }
             try self.bucketColumns?.forEach {
                 try validate($0, name: "bucketColumns[]", parent: name, max: 255)
                 try validate($0, name: "bucketColumns[]", parent: name, min: 1)
@@ -11442,6 +11734,7 @@ extension Glue {
         }
 
         private enum CodingKeys: String, CodingKey {
+            case additionalLocations = "AdditionalLocations"
             case bucketColumns = "BucketColumns"
             case columns = "Columns"
             case compressed = "Compressed"
@@ -12134,6 +12427,24 @@ extension Glue {
         }
     }
 
+    public struct UnfilteredPartition: AWSDecodableShape {
+        public let authorizedColumns: [String]?
+        public let isRegisteredWithLakeFormation: Bool?
+        public let partition: Partition?
+
+        public init(authorizedColumns: [String]? = nil, isRegisteredWithLakeFormation: Bool? = nil, partition: Partition? = nil) {
+            self.authorizedColumns = authorizedColumns
+            self.isRegisteredWithLakeFormation = isRegisteredWithLakeFormation
+            self.partition = partition
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case authorizedColumns = "AuthorizedColumns"
+            case isRegisteredWithLakeFormation = "IsRegisteredWithLakeFormation"
+            case partition = "Partition"
+        }
+    }
+
     public struct UntagResourceRequest: AWSEncodableShape {
         /// The Amazon Resource Name (ARN) of the resource from which to remove the tags.
         public let resourceArn: String
@@ -12408,6 +12719,7 @@ extension Glue {
         public let databaseName: String?
         /// A description of the new crawler.
         public let description: String?
+        public let lakeFormationConfiguration: LakeFormationConfiguration?
         /// Specifies data lineage configuration settings for the crawler.
         public let lineageConfiguration: LineageConfiguration?
         /// Name of the new crawler.
@@ -12425,12 +12737,13 @@ extension Glue {
         /// A list of targets to crawl.
         public let targets: CrawlerTargets?
 
-        public init(classifiers: [String]? = nil, configuration: String? = nil, crawlerSecurityConfiguration: String? = nil, databaseName: String? = nil, description: String? = nil, lineageConfiguration: LineageConfiguration? = nil, name: String, recrawlPolicy: RecrawlPolicy? = nil, role: String? = nil, schedule: String? = nil, schemaChangePolicy: SchemaChangePolicy? = nil, tablePrefix: String? = nil, targets: CrawlerTargets? = nil) {
+        public init(classifiers: [String]? = nil, configuration: String? = nil, crawlerSecurityConfiguration: String? = nil, databaseName: String? = nil, description: String? = nil, lakeFormationConfiguration: LakeFormationConfiguration? = nil, lineageConfiguration: LineageConfiguration? = nil, name: String, recrawlPolicy: RecrawlPolicy? = nil, role: String? = nil, schedule: String? = nil, schemaChangePolicy: SchemaChangePolicy? = nil, tablePrefix: String? = nil, targets: CrawlerTargets? = nil) {
             self.classifiers = classifiers
             self.configuration = configuration
             self.crawlerSecurityConfiguration = crawlerSecurityConfiguration
             self.databaseName = databaseName
             self.description = description
+            self.lakeFormationConfiguration = lakeFormationConfiguration
             self.lineageConfiguration = lineageConfiguration
             self.name = name
             self.recrawlPolicy = recrawlPolicy
@@ -12450,6 +12763,7 @@ extension Glue {
             try self.validate(self.crawlerSecurityConfiguration, name: "crawlerSecurityConfiguration", parent: name, max: 128)
             try self.validate(self.description, name: "description", parent: name, max: 2048)
             try self.validate(self.description, name: "description", parent: name, pattern: "^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\r\\n\\t]*$")
+            try self.lakeFormationConfiguration?.validate(name: "\(name).lakeFormationConfiguration")
             try self.validate(self.name, name: "name", parent: name, max: 255)
             try self.validate(self.name, name: "name", parent: name, min: 1)
             try self.validate(self.name, name: "name", parent: name, pattern: "^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDC00-\\uDBFF\\uDFFF\\t]*$")
@@ -12463,6 +12777,7 @@ extension Glue {
             case crawlerSecurityConfiguration = "CrawlerSecurityConfiguration"
             case databaseName = "DatabaseName"
             case description = "Description"
+            case lakeFormationConfiguration = "LakeFormationConfiguration"
             case lineageConfiguration = "LineageConfiguration"
             case name = "Name"
             case recrawlPolicy = "RecrawlPolicy"

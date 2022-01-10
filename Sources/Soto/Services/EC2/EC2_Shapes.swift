@@ -1724,6 +1724,11 @@ extension EC2 {
         public var description: String { return self.rawValue }
     }
 
+    public enum PayerResponsibility: String, CustomStringConvertible, Codable {
+        case serviceOwner = "ServiceOwner"
+        public var description: String { return self.rawValue }
+    }
+
     public enum PaymentOption: String, CustomStringConvertible, Codable {
         case allUpfront = "AllUpfront"
         case noUpfront = "NoUpfront"
@@ -33677,6 +33682,40 @@ extension EC2 {
         }
     }
 
+    public struct ModifyVpcEndpointServicePayerResponsibilityRequest: AWSEncodableShape {
+        /// Checks whether you have the required permissions for the action, without actually making the request,  and provides an error response. If you have the required permissions, the error response is DryRunOperation.  Otherwise, it is UnauthorizedOperation.
+        public let dryRun: Bool?
+        /// The entity that is responsible for the endpoint costs. The default is the endpoint owner. If you set the payer responsibility to the service owner, you cannot set it back to the endpoint owner.
+        public let payerResponsibility: PayerResponsibility
+        /// The ID of the service.
+        public let serviceId: String
+
+        public init(dryRun: Bool? = nil, payerResponsibility: PayerResponsibility, serviceId: String) {
+            self.dryRun = dryRun
+            self.payerResponsibility = payerResponsibility
+            self.serviceId = serviceId
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case dryRun = "DryRun"
+            case payerResponsibility = "PayerResponsibility"
+            case serviceId = "ServiceId"
+        }
+    }
+
+    public struct ModifyVpcEndpointServicePayerResponsibilityResult: AWSDecodableShape {
+        /// Returns true if the request succeeds; otherwise, it returns an error.
+        public let returnValue: Bool?
+
+        public init(returnValue: Bool? = nil) {
+            self.returnValue = returnValue
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case returnValue = "return"
+        }
+    }
+
     public struct ModifyVpcEndpointServicePermissionsRequest: AWSEncodableShape {
         public struct _AddAllowedPrincipalsEncoding: ArrayCoderProperties { public static let member = "item" }
         public struct _RemoveAllowedPrincipalsEncoding: ArrayCoderProperties { public static let member = "item" }
@@ -40444,6 +40483,8 @@ extension EC2 {
         /// The Amazon Resource Names (ARNs) of the Network Load Balancers for the service.
         @OptionalCustomCoding<ArrayCoder<_NetworkLoadBalancerArnsEncoding, String>>
         public var networkLoadBalancerArns: [String]?
+        /// The payer responsibility.
+        public let payerResponsibility: PayerResponsibility?
         /// The private DNS name for the service.
         public let privateDnsName: String?
         /// Information about the endpoint service private DNS name configuration.
@@ -40461,13 +40502,14 @@ extension EC2 {
         @OptionalCustomCoding<ArrayCoder<_TagsEncoding, Tag>>
         public var tags: [Tag]?
 
-        public init(acceptanceRequired: Bool? = nil, availabilityZones: [String]? = nil, baseEndpointDnsNames: [String]? = nil, gatewayLoadBalancerArns: [String]? = nil, managesVpcEndpoints: Bool? = nil, networkLoadBalancerArns: [String]? = nil, privateDnsName: String? = nil, privateDnsNameConfiguration: PrivateDnsNameConfiguration? = nil, serviceId: String? = nil, serviceName: String? = nil, serviceState: ServiceState? = nil, serviceType: [ServiceTypeDetail]? = nil, tags: [Tag]? = nil) {
+        public init(acceptanceRequired: Bool? = nil, availabilityZones: [String]? = nil, baseEndpointDnsNames: [String]? = nil, gatewayLoadBalancerArns: [String]? = nil, managesVpcEndpoints: Bool? = nil, networkLoadBalancerArns: [String]? = nil, payerResponsibility: PayerResponsibility? = nil, privateDnsName: String? = nil, privateDnsNameConfiguration: PrivateDnsNameConfiguration? = nil, serviceId: String? = nil, serviceName: String? = nil, serviceState: ServiceState? = nil, serviceType: [ServiceTypeDetail]? = nil, tags: [Tag]? = nil) {
             self.acceptanceRequired = acceptanceRequired
             self.availabilityZones = availabilityZones
             self.baseEndpointDnsNames = baseEndpointDnsNames
             self.gatewayLoadBalancerArns = gatewayLoadBalancerArns
             self.managesVpcEndpoints = managesVpcEndpoints
             self.networkLoadBalancerArns = networkLoadBalancerArns
+            self.payerResponsibility = payerResponsibility
             self.privateDnsName = privateDnsName
             self.privateDnsNameConfiguration = privateDnsNameConfiguration
             self.serviceId = serviceId
@@ -40484,6 +40526,7 @@ extension EC2 {
             case gatewayLoadBalancerArns = "gatewayLoadBalancerArnSet"
             case managesVpcEndpoints
             case networkLoadBalancerArns = "networkLoadBalancerArnSet"
+            case payerResponsibility
             case privateDnsName
             case privateDnsNameConfiguration
             case serviceId
@@ -40513,6 +40556,8 @@ extension EC2 {
         public let managesVpcEndpoints: Bool?
         /// The Amazon Web Services account ID of the service owner.
         public let owner: String?
+        /// The payer responsibility.
+        public let payerResponsibility: PayerResponsibility?
         /// The private DNS name for the service.
         public let privateDnsName: String?
         /// The private DNS names assigned to the VPC endpoint service.
@@ -40533,12 +40578,13 @@ extension EC2 {
         /// Indicates whether the service supports endpoint policies.
         public let vpcEndpointPolicySupported: Bool?
 
-        public init(acceptanceRequired: Bool? = nil, availabilityZones: [String]? = nil, baseEndpointDnsNames: [String]? = nil, managesVpcEndpoints: Bool? = nil, owner: String? = nil, privateDnsName: String? = nil, privateDnsNames: [PrivateDnsDetails]? = nil, privateDnsNameVerificationState: DnsNameState? = nil, serviceId: String? = nil, serviceName: String? = nil, serviceType: [ServiceTypeDetail]? = nil, tags: [Tag]? = nil, vpcEndpointPolicySupported: Bool? = nil) {
+        public init(acceptanceRequired: Bool? = nil, availabilityZones: [String]? = nil, baseEndpointDnsNames: [String]? = nil, managesVpcEndpoints: Bool? = nil, owner: String? = nil, payerResponsibility: PayerResponsibility? = nil, privateDnsName: String? = nil, privateDnsNames: [PrivateDnsDetails]? = nil, privateDnsNameVerificationState: DnsNameState? = nil, serviceId: String? = nil, serviceName: String? = nil, serviceType: [ServiceTypeDetail]? = nil, tags: [Tag]? = nil, vpcEndpointPolicySupported: Bool? = nil) {
             self.acceptanceRequired = acceptanceRequired
             self.availabilityZones = availabilityZones
             self.baseEndpointDnsNames = baseEndpointDnsNames
             self.managesVpcEndpoints = managesVpcEndpoints
             self.owner = owner
+            self.payerResponsibility = payerResponsibility
             self.privateDnsName = privateDnsName
             self.privateDnsNames = privateDnsNames
             self.privateDnsNameVerificationState = privateDnsNameVerificationState
@@ -40555,6 +40601,7 @@ extension EC2 {
             case baseEndpointDnsNames = "baseEndpointDnsNameSet"
             case managesVpcEndpoints
             case owner
+            case payerResponsibility
             case privateDnsName
             case privateDnsNames = "privateDnsNameSet"
             case privateDnsNameVerificationState

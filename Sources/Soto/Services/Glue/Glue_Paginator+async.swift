@@ -421,6 +421,27 @@ extension Glue {
         )
     }
 
+    /// Return PaginatorSequence for operation.
+    ///
+    /// - Parameters:
+    ///   - input: Input for request
+    ///   - logger: Logger used flot logging
+    ///   - eventLoop: EventLoop to run this process on
+    public func getUnfilteredPartitionsMetadataPaginator(
+        _ input: GetUnfilteredPartitionsMetadataRequest,
+        logger: Logger = AWSClient.loggingDisabled,
+        on eventLoop: EventLoop? = nil
+    ) -> AWSClient.PaginatorSequence<GetUnfilteredPartitionsMetadataRequest, GetUnfilteredPartitionsMetadataResponse> {
+        return .init(
+            input: input,
+            command: getUnfilteredPartitionsMetadata,
+            inputKey: \GetUnfilteredPartitionsMetadataRequest.nextToken,
+            outputKey: \GetUnfilteredPartitionsMetadataResponse.nextToken,
+            logger: logger,
+            on: eventLoop
+        )
+    }
+
     ///  Retrieves multiple function definitions from the Data Catalog.
     /// Return PaginatorSequence for operation.
     ///

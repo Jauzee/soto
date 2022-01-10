@@ -2494,6 +2494,11 @@ extension EC2 {
         return try await self.client.execute(operation: "ModifyVpcEndpointServiceConfiguration", path: "/", httpMethod: .POST, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
     }
 
+    /// Modifies the payer responsibility for your VPC endpoint service.
+    public func modifyVpcEndpointServicePayerResponsibility(_ input: ModifyVpcEndpointServicePayerResponsibilityRequest, logger: Logger = AWSClient.loggingDisabled, on eventLoop: EventLoop? = nil) async throws -> ModifyVpcEndpointServicePayerResponsibilityResult {
+        return try await self.client.execute(operation: "ModifyVpcEndpointServicePayerResponsibility", path: "/", httpMethod: .POST, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
+    }
+
     /// Modifies the permissions for your VPC endpoint service. You can add or remove permissions for service consumers (IAM users,
     /// 	        IAM roles, and Amazon Web Services accounts) to connect to your endpoint service.
     /// 	        If you grant permissions to all principals, the service is public. Any users who know the name of a
