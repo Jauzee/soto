@@ -39,6 +39,7 @@ public struct GlueErrorType: AWSErrorType {
         case mLTransformNotReadyException = "MLTransformNotReadyException"
         case noScheduleException = "NoScheduleException"
         case operationTimeoutException = "OperationTimeoutException"
+        case permissionTypeMismatchException = "PermissionTypeMismatchException"
         case resourceNotReadyException = "ResourceNotReadyException"
         case resourceNumberLimitExceededException = "ResourceNumberLimitExceededException"
         case schedulerNotRunningException = "SchedulerNotRunningException"
@@ -105,6 +106,7 @@ public struct GlueErrorType: AWSErrorType {
     public static var noScheduleException: Self { .init(.noScheduleException) }
     /// The operation timed out.
     public static var operationTimeoutException: Self { .init(.operationTimeoutException) }
+    public static var permissionTypeMismatchException: Self { .init(.permissionTypeMismatchException) }
     /// A resource was not ready for a transaction.
     public static var resourceNotReadyException: Self { .init(.resourceNotReadyException) }
     /// A resource numerical limit was exceeded.

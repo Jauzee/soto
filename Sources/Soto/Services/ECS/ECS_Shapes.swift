@@ -416,7 +416,7 @@ extension ECS {
         public let details: [KeyValuePair]?
         /// The unique identifier for the attachment.
         public let id: String?
-        ///  The status of the attachment. Valid values are PRECREATED, CREATED, ATTACHING, ATTACHED, DETACHING, DETACHED, and DELETED.
+        ///  The status of the attachment. Valid values are PRECREATED, CREATED, ATTACHING, ATTACHED, DETACHING, DETACHED, DELETED, and FAILED.
         public let status: String?
         /// The type of the attachment, such as ElasticNetworkInterface.
         public let type: String?
@@ -483,7 +483,7 @@ extension ECS {
         public let autoScalingGroupArn: String
         /// The managed scaling settings for the Auto Scaling group capacity provider.
         public let managedScaling: ManagedScaling?
-        /// The managed termination protection setting to use for the Auto Scaling group capacity provider. This determines whether the Auto Scaling group has managed termination protection.  When using managed termination protection, managed scaling must also be used otherwise managed termination protection doesn't work.  When managed termination protection is enabled, Amazon ECS prevents the Amazon EC2 instances in an Auto Scaling group that contain tasks from being terminated during a scale-in action. The Auto Scaling group and each instance in the Auto Scaling group must have instance protection from scale-in actions enabled as well. For more information, see Instance Protection in the Auto Scaling User Guide. When managed termination protection is disabled, your Amazon EC2 instances aren't protected from termination when the Auto Scaling group scales in.
+        /// The managed termination protection setting to use for the Auto Scaling group capacity provider. This determines whether the Auto Scaling group has managed termination protection. The default is disabled.  When using managed termination protection, managed scaling must also be used otherwise managed termination protection doesn't work.  When managed termination protection is enabled, Amazon ECS prevents the Amazon EC2 instances in an Auto Scaling group that contain tasks from being terminated during a scale-in action. The Auto Scaling group and each instance in the Auto Scaling group must have instance protection from scale-in actions enabled as well. For more information, see Instance Protection in the Auto Scaling User Guide. When managed termination protection is disabled, your Amazon EC2 instances aren't protected from termination when the Auto Scaling group scales in.
         public let managedTerminationProtection: ManagedTerminationProtection?
 
         public init(autoScalingGroupArn: String, managedScaling: ManagedScaling? = nil, managedTerminationProtection: ManagedTerminationProtection? = nil) {
@@ -5031,7 +5031,7 @@ extension ECS {
     public struct UpdateContainerInstancesStateRequest: AWSEncodableShape {
         /// The short name or full Amazon Resource Name (ARN) of the cluster that hosts the container instance to update. If you do not specify a cluster, the default cluster is assumed.
         public let cluster: String?
-        /// A list of container instance IDs or full ARN entries.
+        /// A list of up to 10 container instance IDs or full ARN entries.
         public let containerInstances: [String]
         /// The container instance state to update the container instance with. The only valid values for this action are ACTIVE and DRAINING. A container instance can only be updated to DRAINING status once it has reached an ACTIVE state. If a container instance is in REGISTERING, DEREGISTERING, or REGISTRATION_FAILED state you can describe the container instance but can't update the container instance state.
         public let status: ContainerInstanceStatus

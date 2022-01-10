@@ -588,6 +588,18 @@ public struct Glue: AWSService {
         return self.client.execute(operation: "GetTriggers", path: "/", httpMethod: .POST, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
     }
 
+    public func getUnfilteredPartitionMetadata(_ input: GetUnfilteredPartitionMetadataRequest, logger: Logger = AWSClient.loggingDisabled, on eventLoop: EventLoop? = nil) -> EventLoopFuture<GetUnfilteredPartitionMetadataResponse> {
+        return self.client.execute(operation: "GetUnfilteredPartitionMetadata", path: "/", httpMethod: .POST, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
+    }
+
+    public func getUnfilteredPartitionsMetadata(_ input: GetUnfilteredPartitionsMetadataRequest, logger: Logger = AWSClient.loggingDisabled, on eventLoop: EventLoop? = nil) -> EventLoopFuture<GetUnfilteredPartitionsMetadataResponse> {
+        return self.client.execute(operation: "GetUnfilteredPartitionsMetadata", path: "/", httpMethod: .POST, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
+    }
+
+    public func getUnfilteredTableMetadata(_ input: GetUnfilteredTableMetadataRequest, logger: Logger = AWSClient.loggingDisabled, on eventLoop: EventLoop? = nil) -> EventLoopFuture<GetUnfilteredTableMetadataResponse> {
+        return self.client.execute(operation: "GetUnfilteredTableMetadata", path: "/", httpMethod: .POST, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
+    }
+
     /// Retrieves a specified function definition from the Data Catalog.
     public func getUserDefinedFunction(_ input: GetUserDefinedFunctionRequest, logger: Logger = AWSClient.loggingDisabled, on eventLoop: EventLoop? = nil) -> EventLoopFuture<GetUserDefinedFunctionResponse> {
         return self.client.execute(operation: "GetUserDefinedFunction", path: "/", httpMethod: .POST, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)

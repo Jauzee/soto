@@ -442,6 +442,10 @@ extension OpenSearchService {
     }
 
     public struct AdvancedSecurityOptions: AWSDecodableShape {
+        /// Specifies the Anonymous Auth Disable Date when Anonymous Auth is enabled.
+        public let anonymousAuthDisableDate: Date?
+        /// True if Anonymous auth is enabled. Anonymous auth can be enabled only when AdvancedSecurity is enabled on existing domains.
+        public let anonymousAuthEnabled: Bool?
         /// True if advanced security is enabled.
         public let enabled: Bool?
         /// True if the internal user database is enabled.
@@ -449,13 +453,17 @@ extension OpenSearchService {
         /// Describes the SAML application configured for a domain.
         public let sAMLOptions: SAMLOptionsOutput?
 
-        public init(enabled: Bool? = nil, internalUserDatabaseEnabled: Bool? = nil, sAMLOptions: SAMLOptionsOutput? = nil) {
+        public init(anonymousAuthDisableDate: Date? = nil, anonymousAuthEnabled: Bool? = nil, enabled: Bool? = nil, internalUserDatabaseEnabled: Bool? = nil, sAMLOptions: SAMLOptionsOutput? = nil) {
+            self.anonymousAuthDisableDate = anonymousAuthDisableDate
+            self.anonymousAuthEnabled = anonymousAuthEnabled
             self.enabled = enabled
             self.internalUserDatabaseEnabled = internalUserDatabaseEnabled
             self.sAMLOptions = sAMLOptions
         }
 
         private enum CodingKeys: String, CodingKey {
+            case anonymousAuthDisableDate = "AnonymousAuthDisableDate"
+            case anonymousAuthEnabled = "AnonymousAuthEnabled"
             case enabled = "Enabled"
             case internalUserDatabaseEnabled = "InternalUserDatabaseEnabled"
             case sAMLOptions = "SAMLOptions"
@@ -463,6 +471,8 @@ extension OpenSearchService {
     }
 
     public struct AdvancedSecurityOptionsInput: AWSEncodableShape {
+        /// True if Anonymous auth is enabled. Anonymous auth can be enabled only when AdvancedSecurity is enabled on existing domains.
+        public let anonymousAuthEnabled: Bool?
         /// True if advanced security is enabled.
         public let enabled: Bool?
         /// True if the internal user database is enabled.
@@ -472,7 +482,8 @@ extension OpenSearchService {
         /// The SAML application configuration for the domain.
         public let sAMLOptions: SAMLOptionsInput?
 
-        public init(enabled: Bool? = nil, internalUserDatabaseEnabled: Bool? = nil, masterUserOptions: MasterUserOptions? = nil, sAMLOptions: SAMLOptionsInput? = nil) {
+        public init(anonymousAuthEnabled: Bool? = nil, enabled: Bool? = nil, internalUserDatabaseEnabled: Bool? = nil, masterUserOptions: MasterUserOptions? = nil, sAMLOptions: SAMLOptionsInput? = nil) {
+            self.anonymousAuthEnabled = anonymousAuthEnabled
             self.enabled = enabled
             self.internalUserDatabaseEnabled = internalUserDatabaseEnabled
             self.masterUserOptions = masterUserOptions
@@ -485,6 +496,7 @@ extension OpenSearchService {
         }
 
         private enum CodingKeys: String, CodingKey {
+            case anonymousAuthEnabled = "AnonymousAuthEnabled"
             case enabled = "Enabled"
             case internalUserDatabaseEnabled = "InternalUserDatabaseEnabled"
             case masterUserOptions = "MasterUserOptions"

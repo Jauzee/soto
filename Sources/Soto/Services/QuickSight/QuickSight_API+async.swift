@@ -42,7 +42,7 @@ extension QuickSight {
         return try await self.client.execute(operation: "CreateDashboard", path: "/accounts/{AwsAccountId}/dashboards/{DashboardId}", httpMethod: .POST, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
     }
 
-    /// Creates a dataset.
+    /// Creates a dataset. This operation doesn't support datasets that include uploaded files as a source.
     public func createDataSet(_ input: CreateDataSetRequest, logger: Logger = AWSClient.loggingDisabled, on eventLoop: EventLoop? = nil) async throws -> CreateDataSetResponse {
         return try await self.client.execute(operation: "CreateDataSet", path: "/accounts/{AwsAccountId}/data-sets", httpMethod: .POST, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
     }
@@ -77,7 +77,7 @@ extension QuickSight {
         return try await self.client.execute(operation: "CreateIAMPolicyAssignment", path: "/accounts/{AwsAccountId}/namespaces/{Namespace}/iam-policy-assignments/", httpMethod: .POST, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
     }
 
-    /// Creates and starts a new SPICE ingestion on a dataset Any ingestions operating on tagged datasets inherit the same tags automatically for use in access control. For an example, see How do I create an IAM policy to control access to Amazon EC2 resources using tags? in the Amazon Web Services Knowledge Center. Tags are visible on the tagged dataset, but not on the ingestion resource.
+    /// Creates and starts a new SPICE ingestion for a dataset. You can manually refresh datasets in an Enterprise edition account 32 times in a 24-hour period. You can manually refresh datasets in a Standard edition account 8 times in a 24-hour period. Each 24-hour period is measured starting 24 hours before the current date and time. Any ingestions operating on tagged datasets inherit the same tags automatically for use in access control. For an example, see How do I create an IAM policy to control access to Amazon EC2 resources using tags? in the Amazon Web Services Knowledge Center. Tags are visible on the tagged dataset, but not on the ingestion resource.
     public func createIngestion(_ input: CreateIngestionRequest, logger: Logger = AWSClient.loggingDisabled, on eventLoop: EventLoop? = nil) async throws -> CreateIngestionResponse {
         return try await self.client.execute(operation: "CreateIngestion", path: "/accounts/{AwsAccountId}/data-sets/{DataSetId}/ingestions/{IngestionId}", httpMethod: .PUT, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
     }
@@ -222,7 +222,7 @@ extension QuickSight {
         return try await self.client.execute(operation: "DescribeDashboardPermissions", path: "/accounts/{AwsAccountId}/dashboards/{DashboardId}/permissions", httpMethod: .GET, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
     }
 
-    /// Describes a dataset.
+    /// Describes a dataset. This operation doesn't support datasets that include uploaded files as a source.
     public func describeDataSet(_ input: DescribeDataSetRequest, logger: Logger = AWSClient.loggingDisabled, on eventLoop: EventLoop? = nil) async throws -> DescribeDataSetResponse {
         return try await self.client.execute(operation: "DescribeDataSet", path: "/accounts/{AwsAccountId}/data-sets/{DataSetId}", httpMethod: .GET, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
     }
@@ -517,7 +517,7 @@ extension QuickSight {
         return try await self.client.execute(operation: "UpdateDashboardPublishedVersion", path: "/accounts/{AwsAccountId}/dashboards/{DashboardId}/versions/{VersionNumber}", httpMethod: .PUT, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
     }
 
-    /// Updates a dataset.
+    /// Updates a dataset. This operation doesn't support datasets that include uploaded files as a source.
     public func updateDataSet(_ input: UpdateDataSetRequest, logger: Logger = AWSClient.loggingDisabled, on eventLoop: EventLoop? = nil) async throws -> UpdateDataSetResponse {
         return try await self.client.execute(operation: "UpdateDataSet", path: "/accounts/{AwsAccountId}/data-sets/{DataSetId}", httpMethod: .PUT, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
     }

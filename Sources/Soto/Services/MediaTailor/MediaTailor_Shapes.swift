@@ -243,7 +243,7 @@ extension MediaTailor {
         /// The timestamp of when the channel was created.
         @OptionalCustomCoding<UnixEpochDateCoder>
         public var creationTime: Date?
-        /// Contains information about the slate used to fill gaps between programs in the schedule. You must configure FillerSlate if your channel uses an LINEAR PlaybackMode.
+        /// The slate used to fill gaps between programs in the schedule. You must configure filler slate if your channel uses the LINEAR PlaybackMode. MediaTailor doesn't support filler slate for channels using the LOOP PlaybackMode.
         public let fillerSlate: SlateSource?
         /// The timestamp of when the channel was last modified.
         @OptionalCustomCoding<UnixEpochDateCoder>
@@ -320,7 +320,7 @@ extension MediaTailor {
         ]
 
         public let channelName: String
-        /// The slate used to fill gaps between programs in the schedule. You must configure filler slate if your channel uses a LINEAR PlaybackMode.
+        /// The slate used to fill gaps between programs in the schedule. You must configure filler slate if your channel uses the LINEAR PlaybackMode. MediaTailor doesn't support filler slate for channels using the LOOP PlaybackMode.
         public let fillerSlate: SlateSource?
         /// The channel's output properties.
         public let outputs: [RequestOutputItem]
@@ -2341,15 +2341,19 @@ extension MediaTailor {
         ]
 
         public let channelName: String
+        /// The slate used to fill gaps between programs in the schedule. You must configure filler slate if your channel uses the LINEAR PlaybackMode. MediaTailor doesn't support filler slate for channels using the LOOP PlaybackMode.
+        public let fillerSlate: SlateSource?
         /// The channel's output properties.
         public let outputs: [RequestOutputItem]
 
-        public init(channelName: String, outputs: [RequestOutputItem]) {
+        public init(channelName: String, fillerSlate: SlateSource? = nil, outputs: [RequestOutputItem]) {
             self.channelName = channelName
+            self.fillerSlate = fillerSlate
             self.outputs = outputs
         }
 
         private enum CodingKeys: String, CodingKey {
+            case fillerSlate = "FillerSlate"
             case outputs = "Outputs"
         }
     }

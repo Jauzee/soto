@@ -870,6 +870,12 @@ extension EC2 {
         public var description: String { return self.rawValue }
     }
 
+    public enum InstanceMetadataTagsState: String, CustomStringConvertible, Codable {
+        case disabled
+        case enabled
+        public var description: String { return self.rawValue }
+    }
+
     public enum InstanceStateName: String, CustomStringConvertible, Codable {
         case pending
         case running
@@ -1540,6 +1546,12 @@ extension EC2 {
         public var description: String { return self.rawValue }
     }
 
+    public enum LaunchTemplateInstanceMetadataTagsState: String, CustomStringConvertible, Codable {
+        case disabled
+        case enabled
+        public var description: String { return self.rawValue }
+    }
+
     public enum ListingState: String, CustomStringConvertible, Codable {
         case available
         case cancelled
@@ -1716,6 +1728,11 @@ extension EC2 {
         case monthly
         case none
         case weekly
+        public var description: String { return self.rawValue }
+    }
+
+    public enum PayerResponsibility: String, CustomStringConvertible, Codable {
+        case serviceowner = "ServiceOwner"
         public var description: String { return self.rawValue }
     }
 
@@ -5385,6 +5402,8 @@ extension EC2 {
         public let outpostArn: String?
         /// The ID of the Amazon Web Services account that owns the Capacity Reservation.
         public let ownerId: String?
+        /// The Amazon Resource Name (ARN) of the cluster placement group in which the Capacity Reservation was created. For more information, see  Capacity Reservations for cluster placement groups in the Amazon EC2 User Guide.
+        public let placementGroupArn: String?
         /// The date and time at which the Capacity Reservation was started.
         public let startDate: Date?
         /// The current state of the Capacity Reservation. A Capacity Reservation can be in one of the following states:    active - The Capacity Reservation is active and the capacity is available for your use.    expired - The Capacity Reservation expired automatically at the date and time specified in your request. The reserved capacity is no longer available for your use.    cancelled - The Capacity Reservation was cancelled. The reserved capacity is no longer available for your use.    pending - The Capacity Reservation request was successful but the capacity provisioning is still pending.    failed - The Capacity Reservation request has failed. A request might fail due to invalid request parameters, capacity constraints, or instance limit constraints. Failed requests are retained for 60 minutes.
@@ -5397,7 +5416,7 @@ extension EC2 {
         /// The total number of instances for which the Capacity Reservation reserves capacity.
         public let totalInstanceCount: Int?
 
-        public init(availabilityZone: String? = nil, availabilityZoneId: String? = nil, availableInstanceCount: Int? = nil, capacityReservationArn: String? = nil, capacityReservationFleetId: String? = nil, capacityReservationId: String? = nil, createDate: Date? = nil, ebsOptimized: Bool? = nil, endDate: Date? = nil, endDateType: EndDateType? = nil, ephemeralStorage: Bool? = nil, instanceMatchCriteria: InstanceMatchCriteria? = nil, instancePlatform: CapacityReservationInstancePlatform? = nil, instanceType: String? = nil, outpostArn: String? = nil, ownerId: String? = nil, startDate: Date? = nil, state: CapacityReservationState? = nil, tags: [Tag]? = nil, tenancy: CapacityReservationTenancy? = nil, totalInstanceCount: Int? = nil) {
+        public init(availabilityZone: String? = nil, availabilityZoneId: String? = nil, availableInstanceCount: Int? = nil, capacityReservationArn: String? = nil, capacityReservationFleetId: String? = nil, capacityReservationId: String? = nil, createDate: Date? = nil, ebsOptimized: Bool? = nil, endDate: Date? = nil, endDateType: EndDateType? = nil, ephemeralStorage: Bool? = nil, instanceMatchCriteria: InstanceMatchCriteria? = nil, instancePlatform: CapacityReservationInstancePlatform? = nil, instanceType: String? = nil, outpostArn: String? = nil, ownerId: String? = nil, placementGroupArn: String? = nil, startDate: Date? = nil, state: CapacityReservationState? = nil, tags: [Tag]? = nil, tenancy: CapacityReservationTenancy? = nil, totalInstanceCount: Int? = nil) {
             self.availabilityZone = availabilityZone
             self.availabilityZoneId = availabilityZoneId
             self.availableInstanceCount = availableInstanceCount
@@ -5414,6 +5433,7 @@ extension EC2 {
             self.instanceType = instanceType
             self.outpostArn = outpostArn
             self.ownerId = ownerId
+            self.placementGroupArn = placementGroupArn
             self.startDate = startDate
             self.state = state
             self.tags = tags
@@ -5438,6 +5458,7 @@ extension EC2 {
             case instanceType
             case outpostArn
             case ownerId
+            case placementGroupArn
             case startDate
             case state
             case tags = "tagSet"
@@ -6798,13 +6819,15 @@ extension EC2 {
         public let instanceType: String
         /// The Amazon Resource Name (ARN) of the Outpost on which to create the Capacity Reservation.
         public let outpostArn: String?
+        /// The Amazon Resource Name (ARN) of the cluster placement group in which to create the Capacity Reservation. For more information, see  Capacity Reservations for cluster placement groups in the Amazon EC2 User Guide.
+        public let placementGroupArn: String?
         /// The tags to apply to the Capacity Reservation during launch.
         @OptionalCustomCoding<ArrayCoder<_TagSpecificationsEncoding, TagSpecification>>
         public var tagSpecifications: [TagSpecification]?
         /// Indicates the tenancy of the Capacity Reservation. A Capacity Reservation can have one of the following tenancy settings:    default - The Capacity Reservation is created on hardware that is shared with other Amazon Web Services accounts.    dedicated - The Capacity Reservation is created on single-tenant hardware that is dedicated to a single Amazon Web Services account.
         public let tenancy: CapacityReservationTenancy?
 
-        public init(availabilityZone: String? = nil, availabilityZoneId: String? = nil, clientToken: String? = nil, dryRun: Bool? = nil, ebsOptimized: Bool? = nil, endDate: Date? = nil, endDateType: EndDateType? = nil, ephemeralStorage: Bool? = nil, instanceCount: Int, instanceMatchCriteria: InstanceMatchCriteria? = nil, instancePlatform: CapacityReservationInstancePlatform, instanceType: String, outpostArn: String? = nil, tagSpecifications: [TagSpecification]? = nil, tenancy: CapacityReservationTenancy? = nil) {
+        public init(availabilityZone: String? = nil, availabilityZoneId: String? = nil, clientToken: String? = nil, dryRun: Bool? = nil, ebsOptimized: Bool? = nil, endDate: Date? = nil, endDateType: EndDateType? = nil, ephemeralStorage: Bool? = nil, instanceCount: Int, instanceMatchCriteria: InstanceMatchCriteria? = nil, instancePlatform: CapacityReservationInstancePlatform, instanceType: String, outpostArn: String? = nil, placementGroupArn: String? = nil, tagSpecifications: [TagSpecification]? = nil, tenancy: CapacityReservationTenancy? = nil) {
             self.availabilityZone = availabilityZone
             self.availabilityZoneId = availabilityZoneId
             self.clientToken = clientToken
@@ -6818,12 +6841,14 @@ extension EC2 {
             self.instancePlatform = instancePlatform
             self.instanceType = instanceType
             self.outpostArn = outpostArn
+            self.placementGroupArn = placementGroupArn
             self.tagSpecifications = tagSpecifications
             self.tenancy = tenancy
         }
 
         public func validate(name: String) throws {
             try self.validate(self.outpostArn, name: "outpostArn", parent: name, pattern: "^arn:aws([a-z-]+)?:outposts:[a-z\\d-]+:\\d{12}:outpost/op-[a-f0-9]{17}$")
+            try self.validate(self.placementGroupArn, name: "placementGroupArn", parent: name, pattern: "^arn:aws([a-z-]+)?:ec2:[a-z\\d-]+:\\d{12}:placement-group/([^\\s].+[^\\s]){1,255}$")
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -6840,6 +6865,7 @@ extension EC2 {
             case instancePlatform = "InstancePlatform"
             case instanceType = "InstanceType"
             case outpostArn = "OutpostArn"
+            case placementGroupArn = "PlacementGroupArn"
             case tagSpecifications = "TagSpecifications"
             case tenancy = "Tenancy"
         }
@@ -8545,7 +8571,7 @@ extension EC2 {
         /// The IDs of one or more security groups.
         @OptionalCustomCoding<ArrayCoder<_GroupsEncoding, String>>
         public var groups: [String]?
-        /// Indicates the type of network interface. To create an Elastic Fabric Adapter (EFA), specify efa. For more information, see  Elastic Fabric Adapter in the Amazon Elastic Compute Cloud User Guide. To create a trunk network interface, specify efa. For more information, see  Network interface trunking in the Amazon Elastic Compute Cloud User Guide.
+        /// Indicates the type of network interface. To create an Elastic Fabric Adapter (EFA), specify efa. For more information, see  Elastic Fabric Adapter in the Amazon Elastic Compute Cloud User Guide. To create a trunk network interface, specify trunk.
         public let interfaceType: NetworkInterfaceCreationType?
         /// The number of IPv4 prefixes that Amazon Web Services automatically assigns to the network interface. You cannot use this option if you use the Ipv4 Prefixes option.
         public let ipv4PrefixCount: Int?
@@ -13114,7 +13140,7 @@ extension EC2 {
         public var capacityReservationIds: [String]?
         /// Checks whether you have the required permissions for the action, without actually making the request, and provides an error response. If you have the required permissions, the error response is DryRunOperation. Otherwise, it is UnauthorizedOperation.
         public let dryRun: Bool?
-        /// One or more filters.    instance-type - The type of instance for which the Capacity Reservation reserves capacity.    owner-id - The ID of the Amazon Web Services account that owns the Capacity Reservation.    availability-zone-id - The Availability Zone ID of the Capacity Reservation.    instance-platform - The type of operating system for which the Capacity Reservation reserves capacity.    availability-zone - The Availability Zone ID of the Capacity Reservation.    tenancy - Indicates the tenancy of the Capacity Reservation. A Capacity Reservation can have one of the following tenancy settings:    default - The Capacity Reservation is created on hardware that is shared with other Amazon Web Services accounts.    dedicated - The Capacity Reservation is created on single-tenant hardware that is dedicated to a single Amazon Web Services account.      outpost-arn - The Amazon Resource Name (ARN) of the Outpost on which the Capacity Reservation was created.    state - The current state of the Capacity Reservation. A Capacity Reservation can be in one of the following states:    active- The Capacity Reservation is active and the capacity is available for your use.    expired - The Capacity Reservation expired automatically at the date and time specified in your request. The reserved capacity is no longer available for your use.    cancelled - The Capacity Reservation was cancelled. The reserved capacity is no longer available for your use.    pending - The Capacity Reservation request was successful but the capacity provisioning is still pending.    failed - The Capacity Reservation request has failed. A request might fail due to invalid request parameters, capacity constraints, or instance limit constraints. Failed requests are retained for 60 minutes.      start-date - The date and time at which the Capacity Reservation was started.    end-date - The date and time at which the Capacity Reservation expires. When a Capacity Reservation expires, the reserved capacity is released and you can no longer launch instances into it. The Capacity Reservation's state changes to expired when it reaches its end date and time.    end-date-type - Indicates the way in which the Capacity Reservation ends. A Capacity Reservation can have one of the following end types:    unlimited - The Capacity Reservation remains active until you explicitly cancel it.    limited - The Capacity Reservation expires automatically at a specified date and time.      instance-match-criteria - Indicates the type of instance launches that the Capacity Reservation accepts. The options include:    open - The Capacity Reservation accepts all instances that have matching attributes (instance type, platform, and Availability Zone). Instances that have matching attributes launch into the Capacity Reservation automatically without specifying any additional parameters.    targeted - The Capacity Reservation only accepts instances that have matching attributes (instance type, platform, and Availability Zone), and explicitly target the Capacity Reservation. This ensures that only permitted instances can use the reserved capacity.
+        /// One or more filters.    instance-type - The type of instance for which the Capacity Reservation reserves capacity.    owner-id - The ID of the Amazon Web Services account that owns the Capacity Reservation.    instance-platform - The type of operating system for which the Capacity Reservation reserves capacity.    availability-zone - The Availability Zone of the Capacity Reservation.    tenancy - Indicates the tenancy of the Capacity Reservation. A Capacity Reservation can have one of the following tenancy settings:    default - The Capacity Reservation is created on hardware that is shared with other Amazon Web Services accounts.    dedicated - The Capacity Reservation is created on single-tenant hardware that is dedicated to a single Amazon Web Services account.      outpost-arn - The Amazon Resource Name (ARN) of the Outpost on which the Capacity Reservation was created.    state - The current state of the Capacity Reservation. A Capacity Reservation can be in one of the following states:    active- The Capacity Reservation is active and the capacity is available for your use.    expired - The Capacity Reservation expired automatically at the date and time specified in your request. The reserved capacity is no longer available for your use.    cancelled - The Capacity Reservation was cancelled. The reserved capacity is no longer available for your use.    pending - The Capacity Reservation request was successful but the capacity provisioning is still pending.    failed - The Capacity Reservation request has failed. A request might fail due to invalid request parameters, capacity constraints, or instance limit constraints. Failed requests are retained for 60 minutes.      start-date - The date and time at which the Capacity Reservation was started.    end-date - The date and time at which the Capacity Reservation expires. When a Capacity Reservation expires, the reserved capacity is released and you can no longer launch instances into it. The Capacity Reservation's state changes to expired when it reaches its end date and time.    end-date-type - Indicates the way in which the Capacity Reservation ends. A Capacity Reservation can have one of the following end types:    unlimited - The Capacity Reservation remains active until you explicitly cancel it.    limited - The Capacity Reservation expires automatically at a specified date and time.      instance-match-criteria - Indicates the type of instance launches that the Capacity Reservation accepts. The options include:    open - The Capacity Reservation accepts all instances that have matching attributes (instance type, platform, and Availability Zone). Instances that have matching attributes launch into the Capacity Reservation automatically without specifying any additional parameters.    targeted - The Capacity Reservation only accepts instances that have matching attributes (instance type, platform, and Availability Zone), and explicitly target the Capacity Reservation. This ensures that only permitted instances can use the reserved capacity.
         @OptionalCustomCoding<ArrayCoder<_FiltersEncoding, Filter>>
         public var filters: [Filter]?
         /// The maximum number of results to return for the request in a single page. The remaining results can be seen by sending another request with the returned nextToken value. This value can be between 5 and 500. If maxResults is given a larger value than 500, you receive an error.
@@ -15687,7 +15713,7 @@ extension EC2 {
 
         /// Checks whether you have the required permissions for the action, without actually making the request, and provides an error response. If you have the required permissions, the error response is DryRunOperation. Otherwise, it is UnauthorizedOperation.
         public let dryRun: Bool?
-        /// One or more filters.    create-time - The time the launch template version was created.    ebs-optimized - A boolean that indicates whether the instance is optimized for Amazon EBS I/O.    iam-instance-profile - The ARN of the IAM instance profile.    image-id - The ID of the AMI.    instance-type - The instance type.    is-default-version - A boolean that indicates whether the launch template version is the default version.    kernel-id - The kernel ID.    ram-disk-id - The RAM disk ID.
+        /// One or more filters.    create-time - The time the launch template version was created.    ebs-optimized - A boolean that indicates whether the instance is optimized for Amazon EBS I/O.    http-endpoint - Indicates whether the HTTP metadata endpoint on your instances is enabled (enabled | disabled).    http-protocol-ipv4 - Indicates whether the IPv4 endpoint for the instance metadata service is enabled (enabled | disabled).    host-resource-group-arn - The ARN of the host resource group in which to launch the instances.    http-tokens - The state of token usage for your instance metadata requests (optional | required).    iam-instance-profile - The ARN of the IAM instance profile.    image-id - The ID of the AMI.    instance-type - The instance type.    is-default-version - A boolean that indicates whether the launch template version is the default version.    kernel-id - The kernel ID.    license-configuration-arn - The ARN of the license configuration.    network-card-index - The index of the network card.    ram-disk-id - The RAM disk ID.
         @OptionalCustomCoding<ArrayCoder<_FiltersEncoding, Filter>>
         public var filters: [Filter]?
         /// The ID of the launch template. To describe one or more versions of a specified launch template, you must specify either the launch template ID or the launch template name in the request. To describe all the latest or default launch template versions in your account, you must omit this parameter.
@@ -16849,7 +16875,7 @@ extension EC2 {
 
         /// Checks whether you have the required permissions for the action, without actually making the request, and provides an error response. If you have the required permissions, the error response is DryRunOperation. Otherwise, it is UnauthorizedOperation.
         public let dryRun: Bool?
-        /// The filters.    group-name - The name of the placement group.    state - The state of the placement group (pending | available | deleting | deleted).    strategy - The strategy of the placement group (cluster | spread | partition).    tag:&lt;key&gt; - The key/value combination of a tag assigned to the resource. Use the tag key in the filter name and the tag value as the filter value. For example, to find all resources that have a tag with the key Owner and the value TeamA, specify tag:Owner for the filter name and TeamA for the filter value.    tag-key - The key of a tag assigned to the resource. Use this filter to find all resources that have a tag with a specific key, regardless of the tag value.
+        /// The filters.    group-name - The name of the placement group.    group-arn - The Amazon Resource Name (ARN) of the placement group.    state - The state of the placement group (pending | available | deleting | deleted).    strategy - The strategy of the placement group (cluster | spread | partition).    tag:&lt;key&gt; - The key/value combination of a tag assigned to the resource. Use the tag key in the filter name and the tag value as the filter value. For example, to find all resources that have a tag with the key Owner and the value TeamA, specify tag:Owner for the filter name and TeamA for the filter value.    tag-key - The key of a tag assigned to the resource. Use this filter to find all resources that have a tag with a specific key, regardless of the tag value.
         @OptionalCustomCoding<ArrayCoder<_FiltersEncoding, Filter>>
         public var filters: [Filter]?
         /// The IDs of the placement groups.
@@ -17784,7 +17810,7 @@ extension EC2 {
 
         /// Checks whether you have the required permissions for the action, without actually making the request, and provides an error response. If you have the required permissions, the error response is DryRunOperation. Otherwise, it is UnauthorizedOperation.
         public let dryRun: Bool?
-        /// The filters.    snapshot-id - The snapshot ID.    volume-id - The ID of the volume the snapshot is for.    last-tiering-operation - The state of the last archive or restore action. (archiving | archival_error | archival_complete | restoring | restore_error | restore_complete)
+        /// The filters.    snapshot-id - The snapshot ID.    volume-id - The ID of the volume the snapshot is for.    last-tiering-operation - The state of the last archive or restore action. (archival-in-progress | archival-completed | archival-failed | permanent-restore-in-progress | permanent-restore-completed | permanent-restore-failed | temporary-restore-in-progress | temporary-restore-completed | temporary-restore-failed)
         @OptionalCustomCoding<ArrayCoder<_FiltersEncoding, Filter>>
         public var filters: [Filter]?
         /// The maximum number of results to return with a single call. To retrieve the remaining results, make another call with the returned nextToken value.
@@ -22544,7 +22570,7 @@ extension EC2 {
 
         /// The name of the filter. Filter names are case-sensitive.
         public let name: String?
-        /// The filter values. Filter values are case-sensitive.
+        /// The filter values. Filter values are case-sensitive. If you specify multiple values for a filter, the values are joined with an OR, and the request returns all results that match any of the specified values.
         @OptionalCustomCoding<ArrayCoder<_ValuesEncoding, String>>
         public var values: [String]?
 
@@ -22904,7 +22930,7 @@ extension EC2 {
     public struct FleetSpotCapacityRebalance: AWSDecodableShape {
         /// The replacement strategy to use. Only available for fleets of type maintain.  launch - EC2 Fleet launches a new replacement Spot Instance when a rebalance notification is emitted for an existing Spot Instance in the fleet. EC2 Fleet does not terminate the instances that receive a rebalance notification. You can terminate the old instances, or you can leave them running. You are charged for all instances while they are running.   launch-before-terminate - EC2 Fleet launches a new replacement Spot Instance when a rebalance notification is emitted for an existing Spot Instance in the fleet, and then, after a delay that you specify (in TerminationDelay), terminates the instances that received a rebalance notification.
         public let replacementStrategy: FleetReplacementStrategy?
-        /// The amount of time (in seconds) that Amazon EC2 waits before terminating the old Spot Instance after launching a new replacement Spot Instance. Valid only when replacementStrategy is set to launch-before-terminate. Valid values: Minimum value of 120 seconds. Maximum value of 7200 seconds.
+        /// The amount of time (in seconds) that Amazon EC2 waits before terminating the old Spot Instance after launching a new replacement Spot Instance. Required when ReplacementStrategy is set to launch-before-terminate. Not valid when ReplacementStrategy is set to launch. Valid values: Minimum value of 120 seconds. Maximum value of 7200 seconds.
         public let terminationDelay: Int?
 
         public init(replacementStrategy: FleetReplacementStrategy? = nil, terminationDelay: Int? = nil) {
@@ -22921,7 +22947,7 @@ extension EC2 {
     public struct FleetSpotCapacityRebalanceRequest: AWSEncodableShape {
         /// The replacement strategy to use. Only available for fleets of type maintain.  launch - EC2 Fleet launches a replacement Spot Instance when a rebalance notification is emitted for an existing Spot Instance in the fleet. EC2 Fleet does not terminate the instances that receive a rebalance notification. You can terminate the old instances, or you can leave them running. You are charged for all instances while they are running.   launch-before-terminate - EC2 Fleet launches a replacement Spot Instance when a rebalance notification is emitted for an existing Spot Instance in the fleet, and then, after a delay that you specify (in TerminationDelay), terminates the instances that received a rebalance notification.
         public let replacementStrategy: FleetReplacementStrategy?
-        /// The amount of time (in seconds) that Amazon EC2 waits before terminating the old Spot Instance after launching a new replacement Spot Instance. Valid only when ReplacementStrategy is set to launch-before-terminate. Valid values: Minimum value of 120 seconds. Maximum value of 7200 seconds.
+        /// The amount of time (in seconds) that Amazon EC2 waits before terminating the old Spot Instance after launching a new replacement Spot Instance. Required when ReplacementStrategy is set to launch-before-terminate. Not valid when ReplacementStrategy is set to launch. Valid values: Minimum value of 120 seconds. Maximum value of 7200 seconds.
         public let terminationDelay: Int?
 
         public init(replacementStrategy: FleetReplacementStrategy? = nil, terminationDelay: Int? = nil) {
@@ -25722,7 +25748,7 @@ extension EC2 {
         public struct _LicenseSpecificationsEncoding: ArrayCoderProperties { public static let member = "item" }
         public struct _TagSpecificationsEncoding: ArrayCoderProperties { public static let member = "item" }
 
-        /// The architecture of the virtual machine. Valid values: i386 | x86_64 | arm64
+        /// The architecture of the virtual machine. Valid values: i386 | x86_64
         public let architecture: String?
         /// The boot mode of the virtual machine.
         public let bootMode: BootModeValues?
@@ -27133,20 +27159,23 @@ extension EC2 {
     }
 
     public struct InstanceMetadataOptionsRequest: AWSEncodableShape {
-        /// Enables or disables the HTTP metadata endpoint on your instances. If the parameter is not specified, the default state is enabled. If you specify a value of disabled, you will not be able to access your instance metadata.
+        /// Enables or disables the HTTP metadata endpoint on your instances. If you specify a value of disabled, you cannot access your instance metadata. Default: enabled
         public let httpEndpoint: InstanceMetadataEndpointState?
         /// Enables or disables the IPv6 endpoint for the instance metadata service.
         public let httpProtocolIpv6: InstanceMetadataProtocolState?
         /// The desired HTTP PUT response hop limit for instance metadata requests. The larger the number, the further instance metadata requests can travel. Default: 1 Possible values: Integers from 1 to 64
         public let httpPutResponseHopLimit: Int?
-        /// The state of token usage for your instance metadata requests. If the parameter is not specified in the request, the default state is optional. If the state is optional, you can choose to retrieve instance metadata with or without a signed token header on your request. If you retrieve the IAM role credentials without a token, the version 1.0 role credentials are returned. If you retrieve the IAM role credentials using a valid signed token, the version 2.0 role credentials are returned. If the state is required, you must send a signed token header with any instance metadata retrieval requests. In this state, retrieving the IAM role credentials always returns the version 2.0 credentials; the version 1.0 credentials are not available.
+        /// The state of token usage for your instance metadata requests. If the state is optional, you can choose to retrieve instance metadata with or without a signed token header on your request. If you retrieve the IAM role credentials without a token, the version 1.0 role credentials are returned. If you retrieve the IAM role credentials using a valid signed token, the version 2.0 role credentials are returned. If the state is required, you must send a signed token header with any instance metadata retrieval requests. In this state, retrieving the IAM role credentials always returns the version 2.0 credentials; the version 1.0 credentials are not available. Default: optional
         public let httpTokens: HttpTokensState?
+        /// Set to enabled to allow access to instance tags from the instance metadata. Set to disabled to turn off access to instance tags from the instance metadata. For more information, see Work with instance tags using the instance metadata. Default: disabled
+        public let instanceMetadataTags: InstanceMetadataTagsState?
 
-        public init(httpEndpoint: InstanceMetadataEndpointState? = nil, httpProtocolIpv6: InstanceMetadataProtocolState? = nil, httpPutResponseHopLimit: Int? = nil, httpTokens: HttpTokensState? = nil) {
+        public init(httpEndpoint: InstanceMetadataEndpointState? = nil, httpProtocolIpv6: InstanceMetadataProtocolState? = nil, httpPutResponseHopLimit: Int? = nil, httpTokens: HttpTokensState? = nil, instanceMetadataTags: InstanceMetadataTagsState? = nil) {
             self.httpEndpoint = httpEndpoint
             self.httpProtocolIpv6 = httpProtocolIpv6
             self.httpPutResponseHopLimit = httpPutResponseHopLimit
             self.httpTokens = httpTokens
+            self.instanceMetadataTags = instanceMetadataTags
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -27154,26 +27183,30 @@ extension EC2 {
             case httpProtocolIpv6 = "HttpProtocolIpv6"
             case httpPutResponseHopLimit = "HttpPutResponseHopLimit"
             case httpTokens = "HttpTokens"
+            case instanceMetadataTags = "InstanceMetadataTags"
         }
     }
 
     public struct InstanceMetadataOptionsResponse: AWSDecodableShape {
-        /// Indicates whether the HTTP metadata endpoint on your instances is enabled or disabled.
+        /// Indicates whether the HTTP metadata endpoint on your instances is enabled or disabled. If the value is disabled, you cannot access your instance metadata.
         public let httpEndpoint: InstanceMetadataEndpointState?
         /// Indicates whether the IPv6 endpoint for the instance metadata service is enabled or disabled.
         public let httpProtocolIpv6: InstanceMetadataProtocolState?
         /// The desired HTTP PUT response hop limit for instance metadata requests. The larger the number, the further instance metadata requests can travel. Default: 1 Possible values: Integers from 1 to 64
         public let httpPutResponseHopLimit: Int?
-        /// The state of token usage for your instance metadata requests. If the parameter is not specified in the request, the default state is optional. If the state is optional, you can choose to retrieve instance metadata with or without a signed token header on your request. If you retrieve the IAM role credentials without a token, the version 1.0 role credentials are returned. If you retrieve the IAM role credentials using a valid signed token, the version 2.0 role credentials are returned. If the state is required, you must send a signed token header with any instance metadata retrieval requests. In this state, retrieving the IAM role credential always returns the version 2.0 credentials; the version 1.0 credentials are not available.
+        /// The state of token usage for your instance metadata requests. If the state is optional, you can choose to retrieve instance metadata with or without a signed token header on your request. If you retrieve the IAM role credentials without a token, the version 1.0 role credentials are returned. If you retrieve the IAM role credentials using a valid signed token, the version 2.0 role credentials are returned. If the state is required, you must send a signed token header with any instance metadata retrieval requests. In this state, retrieving the IAM role credential always returns the version 2.0 credentials; the version 1.0 credentials are not available. Default: optional
         public let httpTokens: HttpTokensState?
+        /// Indicates whether access to instance tags from the instance metadata is enabled or disabled. For more information, see Work with instance tags using the instance metadata.
+        public let instanceMetadataTags: InstanceMetadataTagsState?
         /// The state of the metadata option changes.  pending - The metadata options are being updated and the instance is not ready to process metadata traffic with the new selection.  applied - The metadata options have been successfully applied on the instance.
         public let state: InstanceMetadataOptionsState?
 
-        public init(httpEndpoint: InstanceMetadataEndpointState? = nil, httpProtocolIpv6: InstanceMetadataProtocolState? = nil, httpPutResponseHopLimit: Int? = nil, httpTokens: HttpTokensState? = nil, state: InstanceMetadataOptionsState? = nil) {
+        public init(httpEndpoint: InstanceMetadataEndpointState? = nil, httpProtocolIpv6: InstanceMetadataProtocolState? = nil, httpPutResponseHopLimit: Int? = nil, httpTokens: HttpTokensState? = nil, instanceMetadataTags: InstanceMetadataTagsState? = nil, state: InstanceMetadataOptionsState? = nil) {
             self.httpEndpoint = httpEndpoint
             self.httpProtocolIpv6 = httpProtocolIpv6
             self.httpPutResponseHopLimit = httpPutResponseHopLimit
             self.httpTokens = httpTokens
+            self.instanceMetadataTags = instanceMetadataTags
             self.state = state
         }
 
@@ -27182,6 +27215,7 @@ extension EC2 {
             case httpProtocolIpv6
             case httpPutResponseHopLimit
             case httpTokens
+            case instanceMetadataTags
             case state
         }
     }
@@ -28989,10 +29023,10 @@ extension EC2 {
         public struct _AddEncoding: ArrayCoderProperties { public static let member = "item" }
         public struct _RemoveEncoding: ArrayCoderProperties { public static let member = "item" }
 
-        /// The Amazon Web Services account ID to add to the list of launch permissions for the AMI.
+        /// The Amazon Web Services account ID, organization ARN, or OU ARN to add to the list of launch permissions for the AMI.
         @OptionalCustomCoding<ArrayCoder<_AddEncoding, LaunchPermission>>
         public var add: [LaunchPermission]?
-        /// The Amazon Web Services account ID to remove from the list of launch permissions for the AMI.
+        /// The Amazon Web Services account ID, organization ARN, or OU ARN to remove from the list of launch permissions for the AMI.
         @OptionalCustomCoding<ArrayCoder<_RemoveEncoding, LaunchPermission>>
         public var remove: [LaunchPermission]?
 
@@ -29525,7 +29559,7 @@ extension EC2 {
     }
 
     public struct LaunchTemplateInstanceMetadataOptions: AWSDecodableShape {
-        /// This parameter enables or disables the HTTP metadata endpoint on your instances. If the parameter is not specified, the default state is enabled.  If you specify a value of disabled, you will not be able to access your instance metadata.
+        /// Enables or disables the HTTP metadata endpoint on your instances. If the parameter is not specified, the default state is enabled.  If you specify a value of disabled, you will not be able to access your instance metadata.
         public let httpEndpoint: LaunchTemplateInstanceMetadataEndpointState?
         /// Enables or disables the IPv6 endpoint for the instance metadata service. Default: disabled
         public let httpProtocolIpv6: LaunchTemplateInstanceMetadataProtocolIpv6?
@@ -29533,14 +29567,16 @@ extension EC2 {
         public let httpPutResponseHopLimit: Int?
         /// The state of token usage for your instance metadata requests. If the parameter is not specified in the request, the default state is optional. If the state is optional, you can choose to retrieve instance metadata with or without a signed token header on your request. If you retrieve the IAM role credentials without a token, the version 1.0 role credentials are returned. If you retrieve the IAM role credentials using a valid signed token, the version 2.0 role credentials are returned. If the state is required, you must send a signed token header with any instance metadata retrieval requests. In this state, retrieving the IAM role credentials always returns the version 2.0 credentials; the version 1.0 credentials are not available.
         public let httpTokens: LaunchTemplateHttpTokensState?
+        public let instanceMetadataTags: LaunchTemplateInstanceMetadataTagsState?
         /// The state of the metadata option changes.  pending - The metadata options are being updated and the instance is not ready to process metadata traffic with the new selection.  applied - The metadata options have been successfully applied on the instance.
         public let state: LaunchTemplateInstanceMetadataOptionsState?
 
-        public init(httpEndpoint: LaunchTemplateInstanceMetadataEndpointState? = nil, httpProtocolIpv6: LaunchTemplateInstanceMetadataProtocolIpv6? = nil, httpPutResponseHopLimit: Int? = nil, httpTokens: LaunchTemplateHttpTokensState? = nil, state: LaunchTemplateInstanceMetadataOptionsState? = nil) {
+        public init(httpEndpoint: LaunchTemplateInstanceMetadataEndpointState? = nil, httpProtocolIpv6: LaunchTemplateInstanceMetadataProtocolIpv6? = nil, httpPutResponseHopLimit: Int? = nil, httpTokens: LaunchTemplateHttpTokensState? = nil, instanceMetadataTags: LaunchTemplateInstanceMetadataTagsState? = nil, state: LaunchTemplateInstanceMetadataOptionsState? = nil) {
             self.httpEndpoint = httpEndpoint
             self.httpProtocolIpv6 = httpProtocolIpv6
             self.httpPutResponseHopLimit = httpPutResponseHopLimit
             self.httpTokens = httpTokens
+            self.instanceMetadataTags = instanceMetadataTags
             self.state = state
         }
 
@@ -29549,12 +29585,13 @@ extension EC2 {
             case httpProtocolIpv6
             case httpPutResponseHopLimit
             case httpTokens
+            case instanceMetadataTags
             case state
         }
     }
 
     public struct LaunchTemplateInstanceMetadataOptionsRequest: AWSEncodableShape {
-        /// This parameter enables or disables the HTTP metadata endpoint on your instances. If the parameter is not specified, the default state is enabled.  If you specify a value of disabled, you will not be able to access your instance metadata.
+        /// Enables or disables the HTTP metadata endpoint on your instances. If the parameter is not specified, the default state is enabled.  If you specify a value of disabled, you will not be able to access your instance metadata.
         public let httpEndpoint: LaunchTemplateInstanceMetadataEndpointState?
         /// Enables or disables the IPv6 endpoint for the instance metadata service. Default: disabled
         public let httpProtocolIpv6: LaunchTemplateInstanceMetadataProtocolIpv6?
@@ -29562,12 +29599,15 @@ extension EC2 {
         public let httpPutResponseHopLimit: Int?
         /// The state of token usage for your instance metadata requests. If the parameter is not specified in the request, the default state is optional. If the state is optional, you can choose to retrieve instance metadata with or without a signed token header on your request. If you retrieve the IAM role credentials without a token, the version 1.0 role credentials are returned. If you retrieve the IAM role credentials using a valid signed token, the version 2.0 role credentials are returned. If the state is required, you must send a signed token header with any instance metadata retrieval requests. In this state, retrieving the IAM role credentials always returns the version 2.0 credentials; the version 1.0 credentials are not available.
         public let httpTokens: LaunchTemplateHttpTokensState?
+        /// Set to enabled to allow access to instance tags from the instance metadata. Set to disabled to turn off access to instance tags from the instance metadata. For more information, see Work with instance tags using the instance metadata. Default: disabled
+        public let instanceMetadataTags: LaunchTemplateInstanceMetadataTagsState?
 
-        public init(httpEndpoint: LaunchTemplateInstanceMetadataEndpointState? = nil, httpProtocolIpv6: LaunchTemplateInstanceMetadataProtocolIpv6? = nil, httpPutResponseHopLimit: Int? = nil, httpTokens: LaunchTemplateHttpTokensState? = nil) {
+        public init(httpEndpoint: LaunchTemplateInstanceMetadataEndpointState? = nil, httpProtocolIpv6: LaunchTemplateInstanceMetadataProtocolIpv6? = nil, httpPutResponseHopLimit: Int? = nil, httpTokens: LaunchTemplateHttpTokensState? = nil, instanceMetadataTags: LaunchTemplateInstanceMetadataTagsState? = nil) {
             self.httpEndpoint = httpEndpoint
             self.httpProtocolIpv6 = httpProtocolIpv6
             self.httpPutResponseHopLimit = httpPutResponseHopLimit
             self.httpTokens = httpTokens
+            self.instanceMetadataTags = instanceMetadataTags
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -29575,6 +29615,7 @@ extension EC2 {
             case httpProtocolIpv6 = "HttpProtocolIpv6"
             case httpPutResponseHopLimit = "HttpPutResponseHopLimit"
             case httpTokens = "HttpTokens"
+            case instanceMetadataTags = "InstanceMetadataTags"
         }
     }
 
@@ -31546,7 +31587,7 @@ extension EC2 {
     public struct ModifyInstanceMetadataOptionsRequest: AWSEncodableShape {
         /// Checks whether you have the required permissions for the action, without actually making the request, and provides an error response. If you have the required permissions, the error response is DryRunOperation. Otherwise, it is UnauthorizedOperation.
         public let dryRun: Bool?
-        /// Enables or disables the HTTP metadata endpoint on your instances. If the parameter is not specified, the existing state is maintained. If you specify a value of disabled, you cannot access your instance metadata.
+        /// Enables or disables the HTTP metadata endpoint on your instances. If this parameter is not specified, the existing state is maintained. If you specify a value of disabled, you cannot access your instance metadata.
         public let httpEndpoint: InstanceMetadataEndpointState?
         /// Enables or disables the IPv6 endpoint for the instance metadata service. This setting applies only if you have enabled the HTTP metadata endpoint.
         public let httpProtocolIpv6: InstanceMetadataProtocolState?
@@ -31556,14 +31597,17 @@ extension EC2 {
         public let httpTokens: HttpTokensState?
         /// The ID of the instance.
         public let instanceId: String
+        /// Set to enabled to allow access to instance tags from the instance metadata. Set to disabled to turn off access to instance tags from the instance metadata. For more information, see Work with instance tags using the instance metadata. Default: disabled
+        public let instanceMetadataTags: InstanceMetadataTagsState?
 
-        public init(dryRun: Bool? = nil, httpEndpoint: InstanceMetadataEndpointState? = nil, httpProtocolIpv6: InstanceMetadataProtocolState? = nil, httpPutResponseHopLimit: Int? = nil, httpTokens: HttpTokensState? = nil, instanceId: String) {
+        public init(dryRun: Bool? = nil, httpEndpoint: InstanceMetadataEndpointState? = nil, httpProtocolIpv6: InstanceMetadataProtocolState? = nil, httpPutResponseHopLimit: Int? = nil, httpTokens: HttpTokensState? = nil, instanceId: String, instanceMetadataTags: InstanceMetadataTagsState? = nil) {
             self.dryRun = dryRun
             self.httpEndpoint = httpEndpoint
             self.httpProtocolIpv6 = httpProtocolIpv6
             self.httpPutResponseHopLimit = httpPutResponseHopLimit
             self.httpTokens = httpTokens
             self.instanceId = instanceId
+            self.instanceMetadataTags = instanceMetadataTags
         }
 
         private enum CodingKeys: String, CodingKey {
@@ -31573,6 +31617,7 @@ extension EC2 {
             case httpPutResponseHopLimit = "HttpPutResponseHopLimit"
             case httpTokens = "HttpTokens"
             case instanceId = "InstanceId"
+            case instanceMetadataTags = "InstanceMetadataTags"
         }
     }
 
@@ -32951,6 +32996,40 @@ extension EC2 {
         }
     }
 
+    public struct ModifyVpcEndpointServicePayerResponsibilityRequest: AWSEncodableShape {
+        /// Checks whether you have the required permissions for the action, without actually making the request, and provides an error response. If you have the required permissions, the error response is DryRunOperation. Otherwise, it is UnauthorizedOperation.
+        public let dryRun: Bool?
+        /// The entity that is responsible for the endpoint costs. The default is the endpoint owner. If you set the payer responsibility to the service owner, you cannot set it back to the endpoint owner.
+        public let payerResponsibility: PayerResponsibility
+        /// The ID of the service.
+        public let serviceId: String
+
+        public init(dryRun: Bool? = nil, payerResponsibility: PayerResponsibility, serviceId: String) {
+            self.dryRun = dryRun
+            self.payerResponsibility = payerResponsibility
+            self.serviceId = serviceId
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case dryRun = "DryRun"
+            case payerResponsibility = "PayerResponsibility"
+            case serviceId = "ServiceId"
+        }
+    }
+
+    public struct ModifyVpcEndpointServicePayerResponsibilityResult: AWSDecodableShape {
+        /// Returns true if the request succeeds; otherwise, it returns an error.
+        public let returnValue: Bool?
+
+        public init(returnValue: Bool? = nil) {
+            self.returnValue = returnValue
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case returnValue = "return"
+        }
+    }
+
     public struct ModifyVpcEndpointServicePermissionsRequest: AWSEncodableShape {
         public struct _AddAllowedPrincipalsEncoding: ArrayCoderProperties { public static let member = "item" }
         public struct _RemoveAllowedPrincipalsEncoding: ArrayCoderProperties { public static let member = "item" }
@@ -33237,7 +33316,7 @@ extension EC2 {
 
         /// The action to take after DPD timeout occurs. Specify restart to restart the IKE initiation. Specify clear to end the IKE session. Valid Values: clear | none | restart  Default: clear
         public let dPDTimeoutAction: String?
-        /// The number of seconds after which a DPD timeout occurs. Constraints: A value between 0 and 30. Default: 30
+        /// The number of seconds after which a DPD timeout occurs. Constraints: A value greater than or equal to 30. Default: 30
         public let dPDTimeoutSeconds: Int?
         /// The IKE versions that are permitted for the VPN tunnel. Valid values: ikev1 | ikev2
         @OptionalCustomCoding<ArrayCoder<_IKEVersionsEncoding, IKEVersionsRequestListValue>>
@@ -33407,15 +33486,15 @@ extension EC2 {
 
     public struct MoveByoipCidrToIpamRequest: AWSEncodableShape {
         /// The BYOIP CIDR.
-        public let cidr: String?
+        public let cidr: String
         /// A check for whether you have the required permissions for the action without actually making the request and provides an error response. If you have the required permissions, the error response is DryRunOperation. Otherwise, it is UnauthorizedOperation.
         public let dryRun: Bool?
         /// The IPAM pool ID.
-        public let ipamPoolId: String?
+        public let ipamPoolId: String
         /// The Amazon Web Services account ID of the owner of the IPAM pool.
-        public let ipamPoolOwner: String?
+        public let ipamPoolOwner: String
 
-        public init(cidr: String? = nil, dryRun: Bool? = nil, ipamPoolId: String? = nil, ipamPoolOwner: String? = nil) {
+        public init(cidr: String, dryRun: Bool? = nil, ipamPoolId: String, ipamPoolOwner: String) {
             self.cidr = cidr
             self.dryRun = dryRun
             self.ipamPoolId = ipamPoolId
@@ -34904,6 +34983,8 @@ extension EC2 {
     public struct PlacementGroup: AWSDecodableShape {
         public struct _TagsEncoding: ArrayCoderProperties { public static let member = "item" }
 
+        /// The Amazon Resource Name (ARN) of the placement group.
+        public let groupArn: String?
         /// The ID of the placement group.
         public let groupId: String?
         /// The name of the placement group.
@@ -34918,7 +34999,8 @@ extension EC2 {
         @OptionalCustomCoding<ArrayCoder<_TagsEncoding, Tag>>
         public var tags: [Tag]?
 
-        public init(groupId: String? = nil, groupName: String? = nil, partitionCount: Int? = nil, state: PlacementGroupState? = nil, strategy: PlacementStrategy? = nil, tags: [Tag]? = nil) {
+        public init(groupArn: String? = nil, groupId: String? = nil, groupName: String? = nil, partitionCount: Int? = nil, state: PlacementGroupState? = nil, strategy: PlacementStrategy? = nil, tags: [Tag]? = nil) {
+            self.groupArn = groupArn
             self.groupId = groupId
             self.groupName = groupName
             self.partitionCount = partitionCount
@@ -34928,6 +35010,7 @@ extension EC2 {
         }
 
         private enum CodingKeys: String, CodingKey {
+            case groupArn
             case groupId
             case groupName
             case partitionCount
@@ -39669,6 +39752,8 @@ extension EC2 {
         /// The Amazon Resource Names (ARNs) of the Network Load Balancers for the service.
         @OptionalCustomCoding<ArrayCoder<_NetworkLoadBalancerArnsEncoding, String>>
         public var networkLoadBalancerArns: [String]?
+        /// The payer responsibility.
+        public let payerResponsibility: PayerResponsibility?
         /// The private DNS name for the service.
         public let privateDnsName: String?
         /// Information about the endpoint service private DNS name configuration.
@@ -39686,13 +39771,14 @@ extension EC2 {
         @OptionalCustomCoding<ArrayCoder<_TagsEncoding, Tag>>
         public var tags: [Tag]?
 
-        public init(acceptanceRequired: Bool? = nil, availabilityZones: [String]? = nil, baseEndpointDnsNames: [String]? = nil, gatewayLoadBalancerArns: [String]? = nil, managesVpcEndpoints: Bool? = nil, networkLoadBalancerArns: [String]? = nil, privateDnsName: String? = nil, privateDnsNameConfiguration: PrivateDnsNameConfiguration? = nil, serviceId: String? = nil, serviceName: String? = nil, serviceState: ServiceState? = nil, serviceType: [ServiceTypeDetail]? = nil, tags: [Tag]? = nil) {
+        public init(acceptanceRequired: Bool? = nil, availabilityZones: [String]? = nil, baseEndpointDnsNames: [String]? = nil, gatewayLoadBalancerArns: [String]? = nil, managesVpcEndpoints: Bool? = nil, networkLoadBalancerArns: [String]? = nil, payerResponsibility: PayerResponsibility? = nil, privateDnsName: String? = nil, privateDnsNameConfiguration: PrivateDnsNameConfiguration? = nil, serviceId: String? = nil, serviceName: String? = nil, serviceState: ServiceState? = nil, serviceType: [ServiceTypeDetail]? = nil, tags: [Tag]? = nil) {
             self.acceptanceRequired = acceptanceRequired
             self.availabilityZones = availabilityZones
             self.baseEndpointDnsNames = baseEndpointDnsNames
             self.gatewayLoadBalancerArns = gatewayLoadBalancerArns
             self.managesVpcEndpoints = managesVpcEndpoints
             self.networkLoadBalancerArns = networkLoadBalancerArns
+            self.payerResponsibility = payerResponsibility
             self.privateDnsName = privateDnsName
             self.privateDnsNameConfiguration = privateDnsNameConfiguration
             self.serviceId = serviceId
@@ -39709,6 +39795,7 @@ extension EC2 {
             case gatewayLoadBalancerArns = "gatewayLoadBalancerArnSet"
             case managesVpcEndpoints
             case networkLoadBalancerArns = "networkLoadBalancerArnSet"
+            case payerResponsibility
             case privateDnsName
             case privateDnsNameConfiguration
             case serviceId
@@ -39738,6 +39825,8 @@ extension EC2 {
         public let managesVpcEndpoints: Bool?
         /// The Amazon Web Services account ID of the service owner.
         public let owner: String?
+        /// The payer responsibility.
+        public let payerResponsibility: PayerResponsibility?
         /// The private DNS name for the service.
         public let privateDnsName: String?
         /// The private DNS names assigned to the VPC endpoint service.
@@ -39758,12 +39847,13 @@ extension EC2 {
         /// Indicates whether the service supports endpoint policies.
         public let vpcEndpointPolicySupported: Bool?
 
-        public init(acceptanceRequired: Bool? = nil, availabilityZones: [String]? = nil, baseEndpointDnsNames: [String]? = nil, managesVpcEndpoints: Bool? = nil, owner: String? = nil, privateDnsName: String? = nil, privateDnsNames: [PrivateDnsDetails]? = nil, privateDnsNameVerificationState: DnsNameState? = nil, serviceId: String? = nil, serviceName: String? = nil, serviceType: [ServiceTypeDetail]? = nil, tags: [Tag]? = nil, vpcEndpointPolicySupported: Bool? = nil) {
+        public init(acceptanceRequired: Bool? = nil, availabilityZones: [String]? = nil, baseEndpointDnsNames: [String]? = nil, managesVpcEndpoints: Bool? = nil, owner: String? = nil, payerResponsibility: PayerResponsibility? = nil, privateDnsName: String? = nil, privateDnsNames: [PrivateDnsDetails]? = nil, privateDnsNameVerificationState: DnsNameState? = nil, serviceId: String? = nil, serviceName: String? = nil, serviceType: [ServiceTypeDetail]? = nil, tags: [Tag]? = nil, vpcEndpointPolicySupported: Bool? = nil) {
             self.acceptanceRequired = acceptanceRequired
             self.availabilityZones = availabilityZones
             self.baseEndpointDnsNames = baseEndpointDnsNames
             self.managesVpcEndpoints = managesVpcEndpoints
             self.owner = owner
+            self.payerResponsibility = payerResponsibility
             self.privateDnsName = privateDnsName
             self.privateDnsNames = privateDnsNames
             self.privateDnsNameVerificationState = privateDnsNameVerificationState
@@ -39780,6 +39870,7 @@ extension EC2 {
             case baseEndpointDnsNames = "baseEndpointDnsNameSet"
             case managesVpcEndpoints
             case owner
+            case payerResponsibility
             case privateDnsName
             case privateDnsNames = "privateDnsNameSet"
             case privateDnsNameVerificationState
@@ -40193,7 +40284,7 @@ extension EC2 {
     public struct SpotCapacityRebalance: AWSEncodableShape & AWSDecodableShape {
         /// The replacement strategy to use. Only available for fleets of type maintain.  launch - Spot Fleet launches a new replacement Spot Instance when a rebalance notification is emitted for an existing Spot Instance in the fleet. Spot Fleet does not terminate the instances that receive a rebalance notification. You can terminate the old instances, or you can leave them running. You are charged for all instances while they are running.   launch-before-terminate - Spot Fleet launches a new replacement Spot Instance when a rebalance notification is emitted for an existing Spot Instance in the fleet, and then, after a delay that you specify (in TerminationDelay), terminates the instances that received a rebalance notification.
         public let replacementStrategy: ReplacementStrategy?
-        /// The amount of time (in seconds) that Amazon EC2 waits before terminating the old Spot Instance after launching a new replacement Spot Instance. Valid only when ReplacementStrategy is set to launch-before-terminate. Valid values: Minimum value of 120 seconds. Maximum value of 7200 seconds.
+        /// The amount of time (in seconds) that Amazon EC2 waits before terminating the old Spot Instance after launching a new replacement Spot Instance. Required when ReplacementStrategy is set to launch-before-terminate. Not valid when ReplacementStrategy is set to launch. Valid values: Minimum value of 120 seconds. Maximum value of 7200 seconds.
         public let terminationDelay: Int?
 
         public init(replacementStrategy: ReplacementStrategy? = nil, terminationDelay: Int? = nil) {
@@ -40660,7 +40751,7 @@ extension EC2 {
     }
 
     public struct SpotMaintenanceStrategies: AWSEncodableShape & AWSDecodableShape {
-        /// The strategy to use when Amazon EC2 emits a signal that your Spot Instance is at an elevated risk of being interrupted.
+        /// The Spot Instance replacement strategy to use when Amazon EC2 emits a signal that your Spot Instance is at an elevated risk of being interrupted. For more information, see Capacity rebalancing in the Amazon EC2 User Guide for Linux Instances.
         public let capacityRebalance: SpotCapacityRebalance?
 
         public init(capacityRebalance: SpotCapacityRebalance? = nil) {
@@ -44774,7 +44865,7 @@ extension EC2 {
 
         /// The action to take after DPD timeout occurs. Specify restart to restart the IKE initiation. Specify clear to end the IKE session. Valid Values: clear | none | restart  Default: clear
         public let dPDTimeoutAction: String?
-        /// The number of seconds after which a DPD timeout occurs. Constraints: A value between 0 and 30. Default: 30
+        /// The number of seconds after which a DPD timeout occurs. Constraints: A value greater than or equal to 30. Default: 30
         public let dPDTimeoutSeconds: Int?
         /// The IKE versions that are permitted for the VPN tunnel. Valid values: ikev1 | ikev2
         @OptionalCustomCoding<ArrayCoder<_IKEVersionsEncoding, IKEVersionsRequestListValue>>

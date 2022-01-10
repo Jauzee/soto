@@ -547,6 +547,18 @@ extension Glue {
         return try await self.client.execute(operation: "GetTriggers", path: "/", httpMethod: .POST, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
     }
 
+    public func getUnfilteredPartitionMetadata(_ input: GetUnfilteredPartitionMetadataRequest, logger: Logger = AWSClient.loggingDisabled, on eventLoop: EventLoop? = nil) async throws -> GetUnfilteredPartitionMetadataResponse {
+        return try await self.client.execute(operation: "GetUnfilteredPartitionMetadata", path: "/", httpMethod: .POST, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
+    }
+
+    public func getUnfilteredPartitionsMetadata(_ input: GetUnfilteredPartitionsMetadataRequest, logger: Logger = AWSClient.loggingDisabled, on eventLoop: EventLoop? = nil) async throws -> GetUnfilteredPartitionsMetadataResponse {
+        return try await self.client.execute(operation: "GetUnfilteredPartitionsMetadata", path: "/", httpMethod: .POST, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
+    }
+
+    public func getUnfilteredTableMetadata(_ input: GetUnfilteredTableMetadataRequest, logger: Logger = AWSClient.loggingDisabled, on eventLoop: EventLoop? = nil) async throws -> GetUnfilteredTableMetadataResponse {
+        return try await self.client.execute(operation: "GetUnfilteredTableMetadata", path: "/", httpMethod: .POST, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
+    }
+
     /// Retrieves a specified function definition from the Data Catalog.
     public func getUserDefinedFunction(_ input: GetUserDefinedFunctionRequest, logger: Logger = AWSClient.loggingDisabled, on eventLoop: EventLoop? = nil) async throws -> GetUserDefinedFunctionResponse {
         return try await self.client.execute(operation: "GetUserDefinedFunction", path: "/", httpMethod: .POST, serviceConfig: self.config, input: input, logger: logger, on: eventLoop)
