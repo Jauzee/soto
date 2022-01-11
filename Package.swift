@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.5
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the Soto for AWS open source project
@@ -17,7 +17,7 @@ import PackageDescription
 
 let package = Package(
     name: "soto",
-    platforms: [.iOS(.v12), .tvOS(.v12), .watchOS(.v5)],
+    platforms: [.iOS(.v12), .tvOS(.v12), .watchOS(.v5), .macOS(.v12)],
     products: [
         .library(name: "SotoACM", targets: ["SotoACM"]),
         .library(name: "SotoACMPCA", targets: ["SotoACMPCA"]),
